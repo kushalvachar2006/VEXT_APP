@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/incoming_call_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_background_gradient">
+
+    <!-- 🔹 Caller Card -->
+    <LinearLayout
+        android:id="@+id/caller_info_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:elevation="8dp">
+
+        <!-- Caller Profile Picture -->
+        <ImageView
+            android:id="@+id/caller_image"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:background="@drawable/circle_maker"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_icon"
+            android:contentDescription="Caller Image"
+            android:elevation="6dp" />
+
+        <!-- Caller Name -->
+        <TextView
+            android:id="@+id/caller_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Caller Name"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Call Type -->
+        <TextView
+            android:id="@+id/call_type_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Video Call"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- 🔹 Call Action Buttons -->
+    <LinearLayout
+        android:id="@+id/call_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginHorizontal="40dp">
+
+        <!-- Accept Button with label -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginEnd="60dp">
+
+            <Button
+                android:id="@+id/btn_accept"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/accept_call_bg"
+                android:foreground="@drawable/phone_selected"
+                android:foregroundTint="@color/white"
+                android:contentDescription="Accept Call"
+                android:elevation="6dp" />
+
+            <TextView
+                android:id="@+id/label_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Answer"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Reject Button with label -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_reject"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/reject_call_bg"
+                android:foreground="@drawable/ic_call_end"
+                android:foregroundTint="@color/white"
+                android:contentDescription="Reject Call"
+                android:elevation="6dp" />
+
+            <TextView
+                android:id="@+id/label_reject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Reject"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <!-- User Icon -->
+    <ImageButton
+        android:id="@+id/chat_icon"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/profile_icon"
+        android:background="@drawable/circle_maker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- Chat info (Name + last message) -->
+    <LinearLayout
+        android:id="@+id/chat_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clickable="true"
+        app:layout_constraintStart_toEndOf="@id/chat_icon"
+        app:layout_constraintTop_toTopOf="@id/chat_icon"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/chat_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="[Name]"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"/>
+
+        <TextView
+            android:id="@+id/chat_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="[Last message preview]"
+            android:textSize="13sp"
+            android:textColor="#808080"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/unseenmessages"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/button_shadow"
+        android:text="1"
+        android:textColor="#ffffff"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@id/chat_info"
+        app:layout_constraintRight_toRightOf="@id/chat_info"
+        android:visibility="gone"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

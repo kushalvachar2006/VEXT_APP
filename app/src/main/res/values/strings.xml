@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">VEXT-Chat_Application</string>
+    <string name="t_c_conditions_text">
+        <![CDATA[
+            <b>Vext Terms &amp; Conditions</b><br/>
+            By using Vext, you agree to these simple rules:<br/>
+            • Be Cool: Don&#39;t spam, harass, bully, or share harmful/illegal content.<br/>
+            • You&#39;re Accountable: You&#39;re responsible for your account and what you post.<br/>
+            • Our Stuff is Ours: The Vext app and its logos are ours. Your messages are yours.<br/>
+            • No Promises: We provide the app "as it is". We can&#39;t guarantee it will be perfect 100% of the time.<br/>
+            • We Can Terminate: We can suspend accounts for breaking these rules.
+        ]]>
+    </string>
+
+    <string name="privacy_condition_text">
+        <![CDATA[
+            <b>Vext Privacy Policy</b><br/>
+            We value your privacy. Here&#39;s the basics:<br/>
+            1. We Collect:<br/>
+            • What you provide: Your phone number, profile name, and messages.<br/>
+            • To help you connect: Your contacts (if you choose to sync them).<br/>
+            • App analytics: How you use the app to help us fix bugs and improve it.<br/>
+            2. We Protect:<br/>
+            • Your private messages and calls are end-to-end encrypted.<br/>
+            • We can&#39;t read or listen to them.<br/>
+            3. We Don&#39;t:<br/>
+            • Sell your personal data to third parties.<br/>
+            • Read your private messages.
+        ]]>
+    </string>
+    <string name="instruction_verify_email">
+    <![CDATA[
+        We&#39;ve sent a verification link to your email.<br/><br/>
+        1. Open the email from <b>VextApp</b>.<br/>
+        2. Click the link to verify your account.<br/>
+        3. Return to the app to continue.
+    ]]>
+</string>
+    <string name="web_client_id">511177505879-911keg0ed092iclemeckgi1e20jjpngo.apps.googleusercontent.com</string>
+    <string name="API_KEY_MAINFEST">AIzaSyDBgjj4bbc8ETOTShkEW1atqdgc_0muPog</string>
+
+</resources>

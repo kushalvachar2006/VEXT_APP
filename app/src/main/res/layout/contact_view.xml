@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ContactView">
+
+    <RelativeLayout
+        android:id="@+id/nav_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/back_btn_contacts_page"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:background="@color/white"
+            android:src="@drawable/back_btn"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="13dp"/>
+
+        <TextView
+            android:id="@+id/contact_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/back_btn_contacts_page"
+            android:layout_marginLeft="10dp"
+            android:text="Select a contact"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/number_of_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_text"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/back_btn_contacts_page"
+            android:text="Contacts"
+            android:textColor="#808080"/>
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/search_bar_contact"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/edittext_bg"
+        android:drawableStart="@drawable/search_icon_xml"
+        android:drawablePadding="8dp"
+        android:inputType="text"
+        android:padding="12dp"
+        android:hint="Enter contact name"
+        android:drawableEnd="@drawable/dialer_icon_xml"
+        app:layout_constraintTop_toBottomOf="@id/nav_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_for_contacts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/search_bar_contact"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

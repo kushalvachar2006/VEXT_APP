@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Sender Message Container (Right Side) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/senderMessageCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="80dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="280dp">
+
+        <LinearLayout
+            android:id="@+id/rightLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/sender_messages_gradient"
+            android:padding="12dp">
+
+            <!-- Sender Text Message -->
+            <TextView
+                android:id="@+id/rightMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+            <!-- Sender File Message -->
+            <LinearLayout
+                android:id="@+id/rightFileLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/rightfileimg"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"/>
+                    <TextView
+                        android:id="@+id/rightFileName"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/rightfileimg"
+                        android:layout_toLeftOf="@id/rightOpenButton"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:text="File name"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:maxLines="2"
+                        android:ellipsize="end" />
+                <Button
+                    android:id="@+id/rightOpenButton"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:textAllCaps="false"
+                    android:textSize="10dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/edittext_bg"
+                    android:text="Open" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Sender Image Message -->
+            <ImageView
+                android:id="@+id/rightImage"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="4dp"
+                android:scaleType="centerCrop"
+                android:clickable="true"
+                android:visibility="gone" />
+
+            <!-- Time -->
+            <TextView
+                android:id="@+id/rightMessageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="4dp"
+                android:text="[Time]"
+                android:textColor="#7F8C8D"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

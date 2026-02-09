@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:id="@+id/contact_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+        <ImageButton
+            android:id="@+id/contact_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Contact Icon"
+            android:padding="8dp"
+            android:background="@drawable/circle_maker"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+        <LinearLayout
+            android:id="@+id/contactinfo"
+            android:clickable="true"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/contact_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginLeft="10sp"/>
+
+            <TextView
+                android:id="@+id/contact_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone Number"
+                android:layout_marginLeft="10sp"
+                android:textColor="#555"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/contact_invite"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:text="Invite"
+            android:textAlignment="viewEnd"
+            android:paddingTop="10dp"
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            android:clickable="true"
+            android:visibility="visible"/>
+
+        <ImageButton
+            android:id="@+id/newcallbtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/circle_maker"
+            android:backgroundTint="@color/white"
+            android:scaleType="centerCrop"
+            android:src="@drawable/new_call_icon"
+            android:visibility="gone"
+            tools:ignore="MissingConstraints" />
+    </LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/callinfo_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contact_layout"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+            <LinearLayout
+                android:id="@+id/voicecall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/curved_border"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/text_voicecall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Voice Call"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp" />
+
+                <ImageButton
+                    android:id="@+id/voicecall_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/phone"
+                    android:background="@drawable/circle_maker"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Voice call icon" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/videocall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/curved_border"
+                android:padding="10dp"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/text_videocall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Video Call"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp" />
+
+                <ImageButton
+                    android:id="@+id/videocall_icon"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/videocall"
+                    android:background="@drawable/circle_maker"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Video call icon" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- 🔹 Remote video (video call mode only) -->
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/remote_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <!-- 🔹 Local video preview (top-right corner, video call mode only) -->
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/local_view"
+        android:layout_width="120dp"
+        android:layout_height="160dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="top|end"
+        android:elevation="8dp"
+        android:visibility="visible" />
+
+    <!-- 🔹 Audio call mode container -->
+    <LinearLayout
+        android:id="@+id/audio_call_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:background="#101010"
+        android:visibility="gone">
+
+        <!-- 📞 Receiver image -->
+        <ImageView
+            android:id="@+id/receiver_image"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/profile_icon"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_maker"
+            android:padding="6dp"
+            android:contentDescription="Receiver image" />
+
+        <!-- Receiver name -->
+        <TextView
+            android:id="@+id/receiver_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receiver Name"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Receiver phone -->
+        <TextView
+            android:id="@+id/receiver_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+91 98765 43210"
+            android:textColor="#AAAAAA"
+            android:textSize="14sp"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Call status (connecting / ringing / ongoing) -->
+        <TextView
+            android:id="@+id/call_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connecting..."
+            android:textColor="#BBBBBB"
+            android:textSize="16sp"
+            android:layout_marginBottom="48dp" />
+
+        <!-- 🔘 Call Controls -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Mute button -->
+            <ImageButton
+                android:id="@+id/btn_mute"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/micbtn"
+                android:scaleType="centerInside"
+                android:contentDescription="Mute"
+                app:tint="#FFFFFF" />
+
+            <!-- End call button -->
+            <ImageButton
+                android:id="@+id/btn_end_call"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_marginHorizontal="36dp"
+                android:background="@drawable/circle_maker"
+                android:backgroundTint="#D32F2F"
+                android:src="@drawable/ic_call_end"
+                android:scaleType="centerInside"
+                android:contentDescription="End call"
+                app:tint="#FFFFFF" />
+
+            <!-- Speaker button -->
+            <ImageButton
+                android:id="@+id/btn_speaker"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_volume_up"
+                android:scaleType="centerInside"
+                android:contentDescription="Speaker"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 🔹 Overlay for receiver info (video mode) -->
+    <LinearLayout
+        android:id="@+id/receiver_info_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="#33000000"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/receiver_image_overlay"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/profile_icon"
+            android:background="@drawable/circle_maker"
+            android:scaleType="centerCrop"
+            android:contentDescription="Receiver Image Overlay" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/receiver_name_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Receiver Name"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/receiver_phone_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+91 98765 43210"
+                android:textColor="#CCCCCC"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 🔹 Bottom control bar (for video calls) -->
+    <LinearLayout
+        android:id="@+id/video_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="24dp"
+        android:paddingTop="12dp"
+        android:background="#33000000"
+        android:visibility="visible">
+
+        <ImageButton
+            android:id="@+id/btn_mute_video"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/micbtn"
+            android:scaleType="centerInside"
+            android:contentDescription="Mute"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btn_end_video_call"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginHorizontal="36dp"
+            android:background="@drawable/circle_maker"
+            android:backgroundTint="#D32F2F"
+            android:src="@drawable/ic_call_end"
+            android:scaleType="centerInside"
+            android:contentDescription="End Call"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btn_switch_camera"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_switch_camera"
+            android:scaleType="centerInside"
+            android:contentDescription="Switch camera"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+
+</FrameLayout>

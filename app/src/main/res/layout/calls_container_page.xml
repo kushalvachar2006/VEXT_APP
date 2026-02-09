@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <!-- ================= MAIN ROW WRAPPED IN LINEARLAYOUT ================= -->
+
+    <LinearLayout
+        android:id="@+id/main_row_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Group or user icon -->
+        <ImageButton
+            android:id="@+id/call_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Contact Icon"
+            android:padding="8dp"
+            android:background="@drawable/circle_maker"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Name + Status -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp">
+
+            <!-- Chat title -->
+            <TextView
+                android:id="@+id/call_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="[Name]"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <!-- Last message preview -->
+            <TextView
+                android:id="@+id/call_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="[Preview of status]"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Call Button -->
+        <ImageButton
+            android:id="@+id/call_icon_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/new_call_icon"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_maker"
+            android:backgroundTint="@color/white"
+            tools:ignore="MissingConstraints"/>
+
+    </LinearLayout>
+
+    <!-- ================= CALL OPTIONS CARD (OUTSIDE LINEARLAYOUT) ================= -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/callinfo_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+
+        app:cardCornerRadius="30dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_row_layout"
+        android:layout_marginTop="6dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <!-- Voice Call -->
+            <LinearLayout
+                android:id="@+id/voicecall_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/curved_border"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/text_voicecall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Voice Call"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/voicecall_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/phone"
+                    android:background="@drawable/circle_maker"
+                    android:scaleType="centerCrop"/>
+            </LinearLayout>
+
+            <!-- Video Call -->
+            <LinearLayout
+                android:id="@+id/videocall_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/curved_border"
+                android:padding="10dp"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/text_videocall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Video Call"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/videocall_icon"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/videocall"
+                    android:background="@drawable/circle_maker"
+                    android:scaleType="centerCrop"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
