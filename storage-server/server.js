@@ -67,22 +67,24 @@ app.post("/upload", (req, res) => {
 });
 
 
-// 🔹 Download + Delete
+// Download by receiver, then delete
 app.get("/download/:filename", (req, res) => {
     const filePath = path.join(UPLOAD_DIR, req.params.filename);
+    const userType = req.query.user; // sender or receiver
 
     if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: "File not found" });
     }
 
     res.download(filePath, (err) => {
-        if (!err) {
+        if (!err && userType === "receiver") {
             fs.unlink(filePath, () => {
-                console.log("Deleted after download:", req.params.filename);
+                console.log("Deleted after receiver download:", req.params.filename);
             });
         }
     });
 });
+
 
 // Health check
 app.get("/", (req, res) => {
