@@ -7,7 +7,7 @@ const path = require("path");
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 
 // Create uploads folder if not exists
@@ -32,19 +32,40 @@ const upload = multer({
 });
 
 // 🔹 Upload endpoint
-app.post("/upload", upload.single("file"), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-    }
+app.post("/upload", (req, res) => {
 
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const fileUrl = `${baseUrl}/download/${req.file.filename}`;
+    upload.single("file")(req, res, function (err) {
 
-    res.json({
-        fileName: req.file.filename,
-        fileUrl: fileUrl
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({
+                error: "Multer error: " + err.message
+            });
+        } else if (err) {
+            return res.status(500).json({
+                error: "Upload error: " + err.message
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({
+                error: "No file uploaded"
+            });
+        }
+
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        const fileUrl = `${baseUrl}/download/${req.file.filename}`;
+
+        console.log("Uploaded:", req.file.filename);
+        console.log("Size:", req.file.size);
+
+        res.json({
+            fileName: req.file.filename,
+            fileUrl: fileUrl
+        });
+
     });
 });
+
 
 // 🔹 Download + Delete
 app.get("/download/:filename", (req, res) => {
