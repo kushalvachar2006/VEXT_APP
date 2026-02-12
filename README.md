@@ -3,7 +3,7 @@
   
 # VEXT_APP - <br> An Advanced Chat & Video Communication Platform
 
-## [App is Live!](https://drive.google.com/file/d/1rjw5O6FcxLhMCstf8UDjErr0UrHZT12Q/view?usp=drivesdk)
+## [App is Live!](https://drive.google.com/file/d/1bcvXN05XoosMN_UGCWZ0a4_osb8RWSsq/view?usp=drivesdk)
 
 [About](#about-the-app) •
 [Features](#core-features) •
