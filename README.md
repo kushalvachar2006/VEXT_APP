@@ -3,6 +3,8 @@
   
 # VEXT_APP - <br> An Advanced Chat & Video Communication Platform
 
+## [App is Live!](https://drive.google.com/file/d/1rjw5O6FcxLhMCstf8UDjErr0UrHZT12Q/view?usp=drivesdk)
+
 [About](#about-the-app) •
 [Features](#core-features) •
 [System Architecture](#system-architecture) •
@@ -318,12 +320,6 @@ When running for the first time, grant the following permissions:
 - Read Contacts
 - Read Media (Images, Videos, Audio)
 - Post Notifications
-
----
-
-## Demo Link
-
-*Demo link to be added - [Add your demo/APK download link here]*
 
 ---
 
