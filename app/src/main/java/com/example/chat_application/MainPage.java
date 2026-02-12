@@ -293,8 +293,6 @@ public class MainPage extends AppCompatActivity {
         }
     }
 
-
-
     private void showPermissionDeniedDialog(String deniedPermissions) {
         new AlertDialog.Builder(this)
                 .setTitle("Permissions Required")
@@ -534,7 +532,9 @@ public class MainPage extends AppCompatActivity {
         String currentUserId = FirebaseAuth.getInstance().getUid();
         Map<String, String> userProfileCache = new LinkedHashMap<>();
         chatList.clear();
-        chatAdapter.notifyDataSetChanged();
+        if (chatAdapter != null) {  
+            chatAdapter.notifyDataSetChanged();
+        }
 
         chats_layout.setVisibility(View.GONE);
         plusnewchat.setVisibility(View.VISIBLE);
@@ -976,11 +976,6 @@ public class MainPage extends AppCompatActivity {
         );
         startActivity(intent);
     }
-
-
-
-
-
     private void selectChatsTab(List<ChatItem> chatList) {
         chatbtn.setBackgroundResource(R.drawable.chats_selected);
         chats.setTypeface(null, Typeface.BOLD);
