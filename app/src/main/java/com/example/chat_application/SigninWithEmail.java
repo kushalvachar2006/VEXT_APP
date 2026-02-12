@@ -1,7 +1,5 @@
 package com.example.chat_application;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -10,6 +8,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,21 +36,21 @@ public class SigninWithEmail extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-        // ---------------- Password Toggle ----------------
+
         passwordtoggle.setOnClickListener(v -> {
             if (isPasswordVisible) {
                 password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                passwordtoggle.setBackgroundResource(R.drawable.eye_open); // show closed eye
+                passwordtoggle.setBackgroundResource(R.drawable.eye_open);
                 isPasswordVisible = false;
             } else {
                 password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                passwordtoggle.setBackgroundResource(R.drawable.eye_close); // show open eye
+                passwordtoggle.setBackgroundResource(R.drawable.eye_close);
                 isPasswordVisible = true;
             }
             password.setSelection(password.getText().length());
         });
 
-        // ---------------- Forgot Password ----------------
+
         forgotpassword.setOnClickListener(v -> {
             String emailStr = email.getText().toString().trim();
             if (emailStr.isEmpty()) {
@@ -72,7 +72,7 @@ public class SigninWithEmail extends AppCompatActivity {
                     });
         });
 
-        // ---------------- Sign In ----------------
+
         signin.setOnClickListener(v -> {
             String emailStr = email.getText().toString().trim();
             String passwordStr = password.getText().toString().trim();

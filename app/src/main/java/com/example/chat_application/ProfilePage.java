@@ -69,7 +69,6 @@ public class ProfilePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_page);
 
-        // --- Initialize UI ---
         profileViewBtn = findViewById(R.id.profile_view_btn);
         editProfilePicBtn = findViewById(R.id.profile_edit_btn);
         setName = findViewById(R.id.setname);
@@ -93,11 +92,11 @@ public class ProfilePage extends AppCompatActivity {
         firestoreDb = FirebaseFirestore.getInstance();
         prefs = getSharedPreferences("user_profile", MODE_PRIVATE);
 
-        // --- Load offline profile immediately ---
+
         loadProfileOffline();
 
 
-        // --- Name/About editor ---
+
         View.OnClickListener openEditor = field -> {
             boolean isName = field.getId() == R.id.setname || field.getId() == R.id.name_icon;
             editTitle.setText(isName ? "Edit Name" : "Edit About");
@@ -111,13 +110,13 @@ public class ProfilePage extends AppCompatActivity {
                 if (!newText.isEmpty()) {
                     if (isName) {
                         setName.setText(newText);
-                        dbRef.child("name").setValue(newText); // Realtime DB
-                        firestoreDb.collection("users").document(currentUser.getUid()).update("name", newText); // Firestore
+                        dbRef.child("name").setValue(newText);
+                        firestoreDb.collection("users").document(currentUser.getUid()).update("name", newText);
                         prefs.edit().putString("name", newText).apply();
                     } else {
                         setAbout.setText(newText);
-                        dbRef.child("about").setValue(newText); // Realtime DB
-                        firestoreDb.collection("users").document(currentUser.getUid()).update("about", newText); // Firestore
+                        dbRef.child("about").setValue(newText);
+                        firestoreDb.collection("users").document(currentUser.getUid()).update("about", newText);
                         prefs.edit().putString("about", newText).apply();
                     }
                 }
@@ -152,7 +151,7 @@ public class ProfilePage extends AppCompatActivity {
 
         backbtn.setOnClickListener(v -> finish());
 
-        // --- Image pick & crop launchers ---
+
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null) startCrop(uri);
         });
@@ -180,7 +179,7 @@ public class ProfilePage extends AppCompatActivity {
             }
         });
 
-        // --- Fetch from Firebase if online ---
+
         if (isOnline()) {
             dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -195,7 +194,7 @@ public class ProfilePage extends AppCompatActivity {
                     if (profile.about == null)
                         profile.about = "Hey there! I am using Vext App";
 
-                    // Update UI
+
                     setName.setText(profile.name);
                     setAbout.setText(profile.about);
                     setEmail.setText(profile.email);
@@ -212,7 +211,7 @@ public class ProfilePage extends AppCompatActivity {
         }
     }
 
-    // --- Offline cache ---
+
     private void saveProfileLocally(UserProfile profile) {
         prefs.edit()
                 .putString("name", profile.name)
@@ -238,7 +237,7 @@ public class ProfilePage extends AppCompatActivity {
         }
     }
 
-    // --- Load profile image ---
+
     private void loadProfileImage(UserProfile profile) {
         File localFile = new File(getFilesDir(), "profile_pic.jpg");
 
@@ -305,15 +304,15 @@ public class ProfilePage extends AppCompatActivity {
                 encodedImage = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             }
 
-            // --- Realtime DB update ---
+
             dbRef.child("profilePicBase64").setValue(encodedImage);
 
-            // --- Firestore update ---
+
             firestoreDb.collection("users")
                     .document(currentUser.getUid())
                     .update("profilePicBase64", encodedImage);
 
-            // --- Local map update ---
+
             UserProfile profile = userProfileMap.get(currentUser.getUid());
             if (profile == null) {
                 profile = new UserProfile();
@@ -321,13 +320,11 @@ public class ProfilePage extends AppCompatActivity {
             }
             profile.profilePicBase64 = encodedImage;
 
-            // --- Save locally ---
+
             File localFile = new File(getFilesDir(), "profile_pic.jpg");
             try (FileOutputStream fos = new FileOutputStream(localFile)) {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
             }
-
-            // --- Load immediately ---
             Glide.with(this)
                     .load(localFile)
                     .circleCrop()

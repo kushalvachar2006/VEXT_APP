@@ -14,12 +14,11 @@ public class CallLauncher {
 
         if (receiverId == null) return;
 
-        //  REMOVED: No longer fetching profile pic here
+
         Intent intent = new Intent(context, Call_layout.class);
         intent.putExtra("receiverId", receiverId);
         intent.putExtra("receiverName", receiverName);
         intent.putExtra("receiverPhone", receiverPhone);
-        //  REMOVED: No longer passing base64 profile through Intent
         intent.putExtra("isVideoCall", isVideoCall);
         intent.putExtra("isCaller", true);
 

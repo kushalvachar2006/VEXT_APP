@@ -2,9 +2,9 @@ package com.example.chat_application;
 
 public class ChatItem {
     private String chatId;
-    private  String name;          // Chat title or username
-    private  String lastMessage;   // Preview text
-    private  String iconResId;// Resource ID for the chat icon
+    private  String name;
+    private  String lastMessage;
+    private  String iconResId;
     private  String receiverId;
     private long timestamp;
 

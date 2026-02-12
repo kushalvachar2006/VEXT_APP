@@ -41,13 +41,12 @@ public class ContactView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_view);
 
-        // UI hooks
         backbtn = findViewById(R.id.back_btn_contacts_page);
         searchcontact = findViewById(R.id.search_bar_contact);
         recyclerView = findViewById(R.id.recyclerview_for_contacts);
         contactCount = findViewById(R.id.number_of_contacts);
 
-        // Setup RecyclerView
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ContactAdapter(this, contactList, null);
         recyclerView.setAdapter(adapter);
@@ -61,7 +60,7 @@ public class ContactView extends AppCompatActivity {
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
                         if (!querySnapshot.isEmpty()) {
-                            // Assuming unique email
+
                             String currentUserPhone = querySnapshot.getDocuments()
                                     .get(0)
                                     .getString("phone");
@@ -70,7 +69,7 @@ public class ContactView extends AppCompatActivity {
                             String currentUserName = querySnapshot.getDocuments()
                                     .get(0)
                                     .getString("name");
-                            // Pass to adapter
+
                             adapter = new ContactAdapter(this, contactList, currentUserPhone);
                             recyclerView.setAdapter(adapter);
                             loadContacts();
@@ -81,24 +80,24 @@ public class ContactView extends AppCompatActivity {
                     });
         }
 
-        // Back button
+
         backbtn.setOnClickListener(v -> finish());
 
-        // --- Search bar toggle logic you had ---
+
         searchcontact.setCursorVisible(false);
         final boolean[] isPhoneInput = {false};
 
         searchcontact.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                Drawable drawableEnd = searchcontact.getCompoundDrawables()[2]; // drawableEnd for LTR
+                Drawable drawableEnd = searchcontact.getCompoundDrawables()[2];
                 if (drawableEnd != null) {
                     int drawableWidth = drawableEnd.getBounds().width();
 
-                    // Check if touch is within drawableEnd area
+
                     if (event.getX() >= (searchcontact.getWidth() - searchcontact.getPaddingEnd() - drawableWidth)) {
 
                         if (!isPhoneInput[0]) {
-                            // Switch to phone number input
+
                             searchcontact.setInputType(InputType.TYPE_CLASS_PHONE);
                             searchcontact.setCompoundDrawablesWithIntrinsicBounds(
                                     R.drawable.search_icon_xml,
@@ -111,7 +110,7 @@ public class ContactView extends AppCompatActivity {
                             searchcontact.setCursorVisible(false);
                             searchcontact.clearFocus();
                         } else {
-                            // Switch back to default text input
+
                             searchcontact.setInputType(InputType.TYPE_CLASS_TEXT);
                             searchcontact.setCompoundDrawablesWithIntrinsicBounds(
                                     R.drawable.search_icon_xml,
@@ -124,7 +123,7 @@ public class ContactView extends AppCompatActivity {
                             searchcontact.setCursorVisible(false);
                             searchcontact.clearFocus();
                         }
-                        return true; // consume touch
+                        return true;
                     }
                 }
             }
@@ -152,7 +151,7 @@ public class ContactView extends AppCompatActivity {
         });
     }
 
-    // --- Fetch contacts from phonebook ---
+
     private void loadContacts() {
         ContentResolver cr = getContentResolver();
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
@@ -181,14 +180,14 @@ public class ContactView extends AppCompatActivity {
                     number = number.replace("+91","");
                 }
                 if (number != null) {
-                    number = number.replaceAll("\\s+", ""); // normalize (remove spaces)
+                    number = number.replaceAll("\\s+", "");
                 }
                 if (number != null && uniqueNumbers.add(number) && number.length() == 10) {
-                    // Temporarily add contact with null UID
+
                     ContactModel model = new ContactModel(name, number, photo, null, name);
                     contactList.add(model);
 
-                    // Check if the contact exists in Firestore
+
                     db.collection("users")
                             .whereEqualTo("phone", "+91" + number)
                             .get()
@@ -196,7 +195,7 @@ public class ContactView extends AppCompatActivity {
                                 if (!querySnapshot.isEmpty()) {
                                     String uid = querySnapshot.getDocuments().get(0).getId();
 
-                                    // Update this contact with the UID
+
                                     model.setUserId(uid);
                                     adapter.notifyDataSetChanged();
                                 }
@@ -209,7 +208,7 @@ public class ContactView extends AppCompatActivity {
             adapter.contactListFull = new ArrayList<>(contactList);
             adapter.notifyDataSetChanged();
         }
-        // Update contact count
+
         contactCount.setText(contactList.size() + " Contacts");
     }
 }

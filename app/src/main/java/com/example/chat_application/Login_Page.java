@@ -50,7 +50,7 @@ public class Login_Page extends AppCompatActivity {
 
         boolean fromSignup = getIntent().getBooleanExtra("fromSignup", false);
 
-        //Signin page navigation
+
         signinwithemail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,24 +59,24 @@ public class Login_Page extends AppCompatActivity {
 
             }
         });
-        //Auto-login restrict for signup-->login navigation
-        if (!fromSignup) { // skip auto-login if coming from SignUp
+
+        if (!fromSignup) {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
                 currentUser.reload().addOnCompleteListener(task -> {
                     if (task.isSuccessful() && currentUser.isEmailVerified()) {
                         navigateToMainPage();
                     } else {
-                        mAuth.signOut(); // ensure unverified users cannot auto-login
+                        mAuth.signOut();
                     }
                 });
             }
         }
 
-        //Google sign-in
+
         signinwithgooglebtn.setOnClickListener(v -> startSignIn());
 
-        //Signup page navigation
+
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,18 +120,18 @@ public class Login_Page extends AppCompatActivity {
                         GoogleIdTokenCredential.createFrom(credential.getData());
 
                 String idToken = googleCred.getIdToken();
-                String email = googleCred.getId(); // Google account email
+                String email = googleCred.getId();
 
-                // Check if this email exists in Firebase
+
                 mAuth.fetchSignInMethodsForEmail(email)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
                                 if (isNewUser) {
-                                    // No account in Firebase → allow sign-up/login
+
                                     firebaseAuthWithGoogle(idToken,true);
                                 } else {
-                                    // Account already exists → block login
+
                                     firebaseAuthWithGoogle(idToken,false);
                                     Toast.makeText(this,
                                             "This email is already registered. Please use another Google account.",

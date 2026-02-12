@@ -11,11 +11,11 @@ public class MessageModel implements Serializable {
     private long timestamp;
     private boolean seen = false;
 
-    // For all message types
-    private String type;          // e.g., "text", "image", "file"
-    private String fileName;      // For file messages
-    private String imageBase64;   // For image messages
-    private String caption;       // Optional caption for image
+
+    private String type;
+    private String fileName;
+    private String imageBase64;
+    private String caption;
 
     public MessageModel() {}
 
@@ -43,7 +43,7 @@ public class MessageModel implements Serializable {
         this.fileuri = fileuri;
     }
 
-    // Getters and Setters
+
     public String getSenderId() {
         return senderId;
     }

@@ -33,7 +33,6 @@
             android:background="@drawable/menu"
             android:layout_centerVertical="true" />
     </RelativeLayout>
-    <!-- 🔎 Search Bar -->
     <EditText
         android:id="@+id/search_bar"
         android:layout_width="0dp"

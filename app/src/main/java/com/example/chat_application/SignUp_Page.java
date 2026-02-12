@@ -48,29 +48,27 @@ public class SignUp_Page extends AppCompatActivity {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!*]).{8,}$";
 
-        //Instruction setter activity
         String instruction_email = getString(R.string.instruction_verify_email);
         instruction.setText(Html.fromHtml(instruction_email,Html.FROM_HTML_MODE_COMPACT));
 
-        //PasswordToggle activtiy
         passwordtoggle.setOnClickListener(v ->{
             if (isPasswordVisible) {
-                // Hide password
+
                 password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                passwordtoggle.setBackgroundResource(R.drawable.eye_open); // show closed eye
+                passwordtoggle.setBackgroundResource(R.drawable.eye_open);
                 isPasswordVisible = false;
             } else {
-                // Show password
+
                 password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                passwordtoggle.setBackgroundResource(R.drawable.eye_close); // show open eye
+                passwordtoggle.setBackgroundResource(R.drawable.eye_close);
                 isPasswordVisible = true;
             }
-            // Move cursor to the end after toggling
+
             password.setSelection(password.getText().length());
         });
 
 
-        //Next btn activity
+
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,13 +94,13 @@ public class SignUp_Page extends AppCompatActivity {
                     return;
                 }
 
-                // Register user in Firebase
+
                 auth.createUserWithEmailAndPassword(emailStr, passwordStr)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = auth.getCurrentUser();
                                 if (user != null) {
-                                    // Send Firebase email verification
+
                                     user.sendEmailVerification()
                                             .addOnCompleteListener(task1 -> {
                                                 if (task1.isSuccessful()) {
@@ -122,13 +120,12 @@ public class SignUp_Page extends AppCompatActivity {
         });
 
 
-        //Verify&Continue btn activity
+
         verifyandcontinue.setOnClickListener(v -> {
             FirebaseUser user = auth.getCurrentUser();
             if (user != null) {
                 user.reload().addOnCompleteListener(task -> {
                     if (user.isEmailVerified()) {
-                        // Save user info to Firestore after email verification
                         saveUserToFirestore(user, name.getText().toString().trim());
 
                         Toast.makeText(SignUp_Page.this,

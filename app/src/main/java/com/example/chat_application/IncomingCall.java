@@ -62,10 +62,10 @@ public class IncomingCall extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        //  Setup window flags for lockscreen
+
         setupWindowFlags();
 
-        //  Process the intent
+
         processIntent(getIntent());
 
         bindViews();
@@ -74,41 +74,37 @@ public class IncomingCall extends AppCompatActivity {
         fetchCallerInfo();
         listenCallCancel();
 
-        //  Register broadcast receiver to close activity from notification actions
+
         registerCloseReceiver();
 
         btnAccept.setOnClickListener(v -> acceptCall());
         btnReject.setOnClickListener(v -> rejectCall());
     }
 
-    //  Handle new intents when activity is already open
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, "onNewIntent called");
-
-        //  Stop previous ringtone if any
         stopRingtone();
 
-        //  Remove previous listener
+
         if (callStatusListener != null) {
             callStatusListener.remove();
             callStatusListener = null;
         }
 
-        //  Process new call
+
         setIntent(intent);
         processIntent(intent);
 
-        //  Restart ringtone
+
         playRingtone();
 
-        //  Fetch new caller info
+
         fetchCallerInfo();
         listenCallCancel();
     }
-
-    //  NEW: Extract intent processing logic
     private void processIntent(Intent intent) {
         if (intent == null) {
             Log.e(TAG, "❌ No intent supplied — finishing");
@@ -124,12 +120,12 @@ public class IncomingCall extends AppCompatActivity {
             return;
         }
 
-        //  Get notification ID to dismiss it later
+
         notificationId = intent.getIntExtra("notificationId", callId.hashCode());
 
         callDocRef = db.collection("calls").document(callId);
 
-        // Pre-populate UI from notification extras if present
+
         if (intent.hasExtra("callerName")) {
             callerNameStr = intent.getStringExtra("callerName");
             if (callerName != null) callerName.setText(callerNameStr);
@@ -146,7 +142,7 @@ public class IncomingCall extends AppCompatActivity {
         Log.d(TAG, "Processing call - callId: " + callId + ", caller: " + callerNameStr);
     }
 
-    //  Setup window flags to show on lockscreen
+
     private void setupWindowFlags() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -161,7 +157,7 @@ public class IncomingCall extends AppCompatActivity {
                 );
             }
 
-            //  Dismiss keyguard (unlock screen)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
                 if (keyguardManager != null) {
@@ -176,7 +172,7 @@ public class IncomingCall extends AppCompatActivity {
                                 PowerManager.ON_AFTER_RELEASE,
                         "chatapp:IncomingCallWakeLock"
                 );
-                wakeLock.acquire(10 * 60 * 1000L); // 10 minutes safety
+                wakeLock.acquire(10 * 60 * 1000L);
             }
 
         } catch (Exception e) {
@@ -184,7 +180,7 @@ public class IncomingCall extends AppCompatActivity {
         }
     }
 
-    //  Register broadcast receiver to close activity when notification actions are triggered
+
     private void registerCloseReceiver() {
         closeReceiver = new BroadcastReceiver() {
             @Override
@@ -230,16 +226,16 @@ public class IncomingCall extends AppCompatActivity {
             return;
         }
 
-        // 🔹 pull video type
+
         Boolean videoFlag = doc.getBoolean("isVideoCall");
         isVideoCall = videoFlag != null && videoFlag;
         callTypeLabel.setText(isVideoCall ? "VIDEO CALL" : "VOICE CALL");
 
-        // 🔹 fetch UID of caller; phone may or may not be present
+
         callerPhone = doc.getString("callerPhone");
         callerUid = doc.getString("callerId");
 
-        // Prefer explicit callerName from doc
+
         String explicitCallerName = doc.getString("callerName");
         if (explicitCallerName != null && !explicitCallerName.isEmpty()) {
             callerNameStr = explicitCallerName;
@@ -250,7 +246,7 @@ public class IncomingCall extends AppCompatActivity {
         }
         callerName.setText(callerNameStr);
 
-        // If phone is missing but we have callerUid, fetch phone and resolve
+
         if ((callerPhone == null || callerPhone.isEmpty()) && callerUid != null && !callerUid.isEmpty()) {
             FirebaseFirestore.getInstance().collection("users")
                     .document(callerUid)
@@ -268,7 +264,7 @@ public class IncomingCall extends AppCompatActivity {
                     });
         }
 
-        // 🔥 Fetch profile photo from realtime DB
+
         if (callerUid != null && !callerUid.isEmpty()) {
             FirebaseDatabase.getInstance().getReference("users")
                     .child(callerUid)
@@ -306,7 +302,7 @@ public class IncomingCall extends AppCompatActivity {
         }
     }
 
-    //  Listen for call cancellation or status changes
+
     private void listenCallCancel() {
         callStatusListener = callDocRef.addSnapshotListener((snap, e) -> {
             if (e != null) {
@@ -326,7 +322,7 @@ public class IncomingCall extends AppCompatActivity {
             if (status != null) {
                 Log.d(TAG, "Call status: " + status);
 
-                //  If caller ended or rejected before receiver could answer
+
                 if ("ended".equals(status) || "rejected".equals(status)) {
                     Log.d(TAG, "Call was cancelled by caller");
                     stopRingtone();
@@ -368,7 +364,7 @@ public class IncomingCall extends AppCompatActivity {
         }
     }
 
-    //  Dismiss the notification
+
     private void dismissNotification() {
         try {
             NotificationManager notificationManager =
@@ -382,30 +378,31 @@ public class IncomingCall extends AppCompatActivity {
         }
     }
 
-    //  ACCEPT CALL: Navigate to Call_layout
+
     private void acceptCall() {
         Log.d(TAG, "Call accepted");
 
         stopRingtone();
         dismissNotification();
+        Intent serviceIntent = new Intent(this, IncomingCallService.class);
+        stopService(serviceIntent);
 
-        //  Update Firestore status to "accepted"
+
         callDocRef.update("status", "accepted")
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Call status updated to accepted");
 
-                    //  Navigate to Call_layout
+
                     Intent intent = new Intent(this, Call_layout.class);
-                    intent.putExtra("isCaller", false); //  Receiver accepting call
+                    intent.putExtra("isCaller", false);
                     intent.putExtra("isVideoCall", isVideoCall);
                     intent.putExtra("callId", callId);
                     intent.putExtra("receiverName", callerNameStr);
-//                    intent.putExtra("receiverProfile", callerProfileBase64);
-                    intent.putExtra("receiverId", callerUid); //  Pass caller UID
+                    intent.putExtra("receiverId", callerUid);
                     intent.putExtra("receiverPhone", callerPhone);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                    finish(); //  Close IncomingCall activity
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to accept call", e);
@@ -413,18 +410,20 @@ public class IncomingCall extends AppCompatActivity {
                 });
     }
 
-    //  REJECT CALL: Update Firestore and close activity
+
     private void rejectCall() {
         Log.d(TAG, "Call rejected");
 
         stopRingtone();
         dismissNotification();
+        Intent serviceIntent = new Intent(this, IncomingCallService.class);
+        stopService(serviceIntent);
 
-        //  Update Firestore status to "rejected"
+
         callDocRef.update("status", "rejected")
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Call status updated to rejected");
-                    finish(); //  Close IncomingCall activity
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to reject call", e);
@@ -436,13 +435,13 @@ public class IncomingCall extends AppCompatActivity {
     protected void onDestroy() {
         stopRingtone();
 
-        //  Remove Firestore listener
+
         if (callStatusListener != null) {
             callStatusListener.remove();
             callStatusListener = null;
         }
 
-        // Unregister broadcast receiver
+
         try {
             if (closeReceiver != null) {
                 unregisterReceiver(closeReceiver);

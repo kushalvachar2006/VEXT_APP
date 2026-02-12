@@ -35,24 +35,20 @@ public class Full_screen_profile extends AppCompatActivity {
             File file = new File(uri.getPath());
 
             if (file.exists()) {
-                // Load local cached file (offline supported)
                 Glide.with(this)
                         .load(file)
                         .signature(new ObjectKey(file.lastModified()))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(fullScreenImage);
             } else if (imagePath.startsWith("android.resource://")) {
-                // Load resource URI (default icon)
                 Glide.with(this)
                         .load(uri)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(fullScreenImage);
             } else {
-                // Fallback to Firebase Auth photo
                 loadFirebaseProfile();
             }
         } else {
-            // No image path provided → fallback to Firebase Auth
             loadFirebaseProfile();
         }
 

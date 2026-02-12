@@ -27,8 +27,9 @@ android {
 
         multiDexEnabled = true
 
-        buildConfigField("String", "WEB_CLIENT_ID", "\"${localProperties.getProperty("web_client_id")}\"")
-        buildConfigField("String", "API_KEY_MANIFEST", "\"${localProperties.getProperty("API_KEY_MAINFEST")}\"")
+        resValue("string", "web_client_id", "\"${localProperties.getProperty("web_client_id")}\"")
+        resValue("string", "API_KEY_MAINFEST", "\"${localProperties.getProperty("API_KEY_MAINFEST")}\"")
+        resValue("string", "RENDER_LINK", "\"${localProperties.getProperty("RENDER_LINK")}\"")
     }
 
     buildFeatures {
@@ -83,6 +84,7 @@ dependencies {
     implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     implementation ("com.squareup.okhttp3:okhttp:4.12.0")
     implementation ("com.infobip:google-webrtc:1.0.0035529")
+    implementation("androidx.core:core:1.12.0") // For call-style
     implementation ("com.github.chrisbanes:PhotoView:2.3.0")//For PhotoView
 
     implementation(libs.appcompat)

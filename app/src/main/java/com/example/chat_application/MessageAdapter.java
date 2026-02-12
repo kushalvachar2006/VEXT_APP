@@ -23,6 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -122,11 +125,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case "mp4": return "video/mp4";
             case "mp3": return "audio/mpeg";
             case "doc":
-            case "docx": return "application/msword";
+            case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
             case "ppt":
-            case "pptx": return "application/vnd.ms-powerpoint";
+            case "pptx": return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
             case "xls":
-            case "xlsx": return "application/vnd.ms-excel";
+            case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             case "txt": return "text/plain";
             default: return "*/*";
         }
@@ -135,50 +138,65 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     /**
      * Download file from Base64 string and save to local storage
      */
-    private File downloadFileFromBase64(Context context, String base64Data, String fileName) throws Exception {
-        Log.d(TAG, "Downloading file from Base64 data");
-        Log.d(TAG, "File name: " + fileName);
+    private File downloadFileFromUrl(Context context, String fileUrl, String fileName) throws Exception {
+        return downloadFileFromUrl(context, fileUrl, fileName, 0);
+    }
 
-        if (base64Data == null || base64Data.isEmpty()) {
-            throw new Exception("File data is empty");
+    private File downloadFileFromUrl(Context context, String fileUrl, String fileName, int redirectCount) throws Exception {
+        if (redirectCount > 5) {
+            throw new Exception("Too many redirects");
         }
 
-        // Create downloads directory
         File dir = new File(context.getExternalFilesDir(null), "VextApp/Downloads");
-        if (!dir.exists()) {
-            boolean created = dir.mkdirs();
-            Log.d(TAG, "Downloads directory created: " + created);
-        }
+        if (!dir.exists()) dir.mkdirs();
 
-        // Create file
         File outFile = new File(dir, fileName);
 
-        // If file already exists, return it
-        if (outFile.exists()) {
-            Log.d(TAG, "File already exists at: " + outFile.getAbsolutePath());
-            return outFile;
+        URL url = new URL(fileUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setInstanceFollowRedirects(false);
+        connection.connect();
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+            String newUrl = connection.getHeaderField("Location");
+            connection.disconnect();
+            return downloadFileFromUrl(context, newUrl, fileName, redirectCount + 1);
         }
 
-        // Decode Base64 and write to file
-        byte[] fileBytes = Base64.decode(base64Data, Base64.DEFAULT);
-        FileOutputStream fos = new FileOutputStream(outFile);
-        fos.write(fileBytes);
-        fos.flush();
-        fos.close();
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new Exception("Server returned HTTP " + connection.getResponseCode());
+        }
 
-        Log.d(TAG, "File downloaded successfully. Size: " + fileBytes.length + " bytes");
-        Log.d(TAG, "File saved at: " + outFile.getAbsolutePath());
+        InputStream inputStream = connection.getInputStream();
+        FileOutputStream outputStream = new FileOutputStream(outFile);
+
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
+        connection.disconnect();
 
         return outFile;
     }
 
-    // Format timestamp -> hh:mm a
+
+
+
     private String formatTime(long timestamp) {
         return new SimpleDateFormat("hh:mm a", Locale.getDefault())
                 .format(new Date(timestamp));
     }
 
-    // ------------------ Sent Messages ------------------ //
+
     class SentMessageViewHolder extends RecyclerView.ViewHolder {
         TextView textMessage, time, fileName;
         LinearLayout fileLayout;
@@ -277,7 +295,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                         new Thread(() -> {
                             try {
-                                File localFile = downloadFileFromBase64(
+                                File localFile = downloadFileFromUrl(
                                         v.getContext(),
                                         fileData,
                                         message.getFileName()
@@ -287,6 +305,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     openButton.setEnabled(true);
                                     openButton.setText("Open");
                                     Toast.makeText(v.getContext(), "Opening file...", Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "File exists: " + localFile.exists());
+                                    Log.d(TAG, "File path: " + localFile.getAbsolutePath());
+                                    Log.d(TAG, "File size: " + localFile.length());
                                     openFile(v, localFile);
                                 });
 
@@ -305,7 +326,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         }).start();
                     });
 
-                    // Set file icon
+
                     String ext = "";
                     int i = message.getFileName().lastIndexOf('.');
                     if (i > 0) ext = message.getFileName().substring(i + 1).toLowerCase();
@@ -362,7 +383,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    // ------------------ Received Messages ------------------ //
+
     class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         TextView textMessage, time, fileName;
         LinearLayout fileLayout;
@@ -447,58 +468,77 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     fileLayout.setVisibility(View.VISIBLE);
                     fileName.setText(message.getFileName());
 
-                    openButton.setText("Download & Open");
+                    File dir = new File(itemView.getContext().getExternalFilesDir(null), "VextApp/Downloads");
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File localFile = new File(dir, message.getFileName());
+
+                    if (localFile.exists()) {
+                        openButton.setText("Open");
+                    } else {
+                        openButton.setText("Download");
+                    }
+
                     openButton.setOnClickListener(v -> {
-                        String fileData = message.getFileUri();
+                        if (localFile.exists()) {
+                            openFile(v, localFile);
+                        } else {
+                            String fileData = message.getFileUri();
 
-                        if (fileData == null || fileData.isEmpty()) {
-                            Toast.makeText(v.getContext(), "File data is missing", Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "File data is null or empty");
-                            return;
-                        }
-
-                        Toast.makeText(v.getContext(), "Starting download...", Toast.LENGTH_SHORT).show();
-                        openButton.setEnabled(false);
-                        openButton.setText("Downloading...");
-
-                        new Thread(() -> {
-                            try {
-                                // Show downloading toast
-                                ((Activity) v.getContext()).runOnUiThread(() -> {
-                                    Toast.makeText(v.getContext(), "Downloading file to device...", Toast.LENGTH_SHORT).show();
-                                });
-
-                                // Download file to local storage
-                                File localFile = downloadFileFromBase64(
-                                        v.getContext(),
-                                        fileData,
-                                        message.getFileName()
-                                );
-
-                                // Show download complete and opening
-                                ((Activity) v.getContext()).runOnUiThread(() -> {
-                                    openButton.setEnabled(true);
-                                    openButton.setText("Open");
-                                    Toast.makeText(v.getContext(), "Download complete! Opening file...", Toast.LENGTH_SHORT).show();
-                                    openFile(v, localFile);
-                                });
-
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error downloading file", e);
-                                ((Activity) v.getContext()).runOnUiThread(() -> {
-                                    openButton.setEnabled(true);
-                                    openButton.setText("Download & Open");
-                                    Toast.makeText(
-                                            v.getContext(),
-                                            "Download failed: " + e.getMessage(),
-                                            Toast.LENGTH_LONG
-                                    ).show();
-                                });
+                            if (fileData == null || fileData.isEmpty()) {
+                                Toast.makeText(v.getContext(), "File data is missing", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "File data is null or empty");
+                                return;
                             }
-                        }).start();
+
+                            Toast.makeText(v.getContext(), "Starting download...", Toast.LENGTH_SHORT).show();
+                            openButton.setEnabled(false);
+                            openButton.setText("Downloading...");
+
+                            new Thread(() -> {
+                                try {
+
+                                    ((Activity) v.getContext()).runOnUiThread(() -> {
+                                        Toast.makeText(v.getContext(), "Downloading file to device...", Toast.LENGTH_SHORT).show();
+                                    });
+
+
+                                    File downloadedFile = downloadFileFromUrl(
+                                            v.getContext(),
+                                            fileData,
+                                            message.getFileName()
+                                    );
+
+
+                                    ((Activity) v.getContext()).runOnUiThread(() -> {
+                                        openButton.setEnabled(true);
+                                        openButton.setText("Open");
+                                        Toast.makeText(v.getContext(), "Download complete! Opening file...", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "File exists: " + downloadedFile.exists());
+                                        Log.d(TAG, "File path: " + downloadedFile.getAbsolutePath());
+                                        Log.d(TAG, "File size: " + downloadedFile.length());
+
+                                        openFile(v, downloadedFile);
+                                    });
+
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error downloading file", e);
+                                    ((Activity) v.getContext()).runOnUiThread(() -> {
+                                        openButton.setEnabled(true);
+                                        openButton.setText("Download");
+                                        Toast.makeText(
+                                                v.getContext(),
+                                                "Download failed: " + e.getMessage(),
+                                                Toast.LENGTH_LONG
+                                        ).show();
+                                    });
+                                }
+                            }).start();
+                        }
                     });
 
-                    // Set file icon
+
                     String ext = "";
                     int i = message.getFileName().lastIndexOf('.');
                     if (i > 0) ext = message.getFileName().substring(i + 1).toLowerCase();

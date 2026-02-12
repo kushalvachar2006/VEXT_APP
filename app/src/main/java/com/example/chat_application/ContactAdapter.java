@@ -43,7 +43,7 @@ import java.util.List;
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> implements Filterable {
     Context context;
     List<ContactModel> contactList;
-    public static List<ContactModel> contactListFull; // backup list for filtering
+    public static List<ContactModel> contactListFull;
     FirebaseFirestore db=FirebaseFirestore.getInstance();
     private String currentUserPhone;
     public static HashMap<String, String> uidToLocalName = new HashMap<>();
@@ -90,7 +90,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                         }
                     }
 
-                    // Merge lists: registered first
                     contactList.clear();
                     contactList.addAll(registeredContacts);
                     contactList.addAll(nonRegisteredContacts);
@@ -117,7 +116,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         String contactname;
         DatabaseReference myProfileRef = FirebaseDatabase.getInstance()
                 .getReference("users")
-                .child(currentUserPhone)   // ⚠️ if phone = uid else change to uid variable
+                .child(currentUserPhone)
                 .child("profilePicBase64");
 
         myProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,7 +137,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         });
 
 
-        // --- Display name ---
+
         if (contact.getPhoneNumber() != null && contact.getPhoneNumber().equals(currentUserPhone)) {
             contactname = contact.getName()+" (You)";
         } else {
@@ -148,13 +147,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
         holder.phone.setText(contact.getPhoneNumber());
 
-        // --- Load profile image ---
+
         loadcontact(holder, contact, position);
 
-        // --- Fullscreen profile click ---
+
         holder.icon.setOnClickListener(v -> openContactFullScreen(contact));
 
-        // --- Gradient text for invite ---
+
         Paint paint = holder.invite.getPaint();
         float width = paint.measureText(holder.invite.getText().toString());
         Shader shader = new LinearGradient(
@@ -165,60 +164,32 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         holder.invite.getPaint().setShader(shader);
         holder.invite.invalidate();
 
-        //Message layout intent
+
         holder.contactinfo.setOnClickListener(v -> {
-            Intent intent = new Intent(context, Message_layout.class);
-
-            String senderLocalName = getLocalNameByPhone(currentUserPhone);
-            // Receiver's name as saved in sender's phonebook
-            String receiverLocalName=contact.getPhoneNumber().equals(currentUserPhone)?contactname:(contact.isAlreadyRegistered() ?
-                    getLocalNameByUid(contact.getUserId(), contact.getName()) : contact.getName());
-
-            db.collection("users")
-                    .document(contact.getUserId())
-                    .update("contactname", receiverLocalName);
-
-            currentname = receiverLocalName;
-            intent.putExtra("contactName", receiverLocalName);
-            intent.putExtra("contactPhone", contact.getPhoneNumber());
-
 
             if (contact.isAlreadyRegistered() && contact.getUserId() != null) {
+
+                Intent intent = new Intent(context, Message_layout.class);
+
+                String receiverLocalName = getLocalNameByUid(
+                        contact.getUserId(),
+                        contact.getName()
+                );
+
                 intent.putExtra("receiverId", contact.getUserId());
+                intent.putExtra("contactName", receiverLocalName);
+                intent.putExtra("contactPhone", contact.getPhoneNumber());
 
-                DatabaseReference userRef = FirebaseDatabase.getInstance()
-                        .getReference("users")
-                        .child(contact.getUserId())
-                        .child("profilePicBase64");
-
-                // Fetch the profile picture once before opening Message_layout
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        String base64 = snapshot.getValue(String.class);
-
-                        if (base64 != null && !base64.isEmpty()) {
-                            intent.putExtra("profilePicBase64", base64);
-                        } else {
-                            intent.putExtra("profilePicBase64", ""); // fallback empty
-                        }
-                        context.startActivity(intent);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        intent.putExtra("profilePicBase64", ""); // fallback empty
-                        context.startActivity(intent);
-                    }
-                });
-            } else {
-                intent.putExtra("profilePicBase64", "");
                 context.startActivity(intent);
+
+            } else {
+                // Not registered → maybe show toast or do nothing
             }
         });
 
 
-        // --- Invite button ---
+
+
         if (contact.isAlreadyRegistered()) {
             if(MainPage.isCallIcon==true){
                 holder.newcallbtn.setVisibility(View.VISIBLE);
@@ -277,7 +248,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                         contact.getUserId(),
                         contact.getName(),
                         contact.getPhoneNumber(),
-                        false     // voice call
+                        false
                 );
             }
         });
@@ -289,14 +260,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                         contact.getUserId(),
                         contact.getName(),
                         contact.getPhoneNumber(),
-                        true      // video call
+                        true
                 );
             }
         });
 
 
 
-// Optional: mirror text clicks to buttons
+
         holder.voicecalltext.setOnClickListener(v -> holder.voicecall.performClick());
         holder.videocalltext.setOnClickListener(v -> holder.videocall.performClick());
 
@@ -328,14 +299,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                 return contact.getName();
             }
         }
-        return "You"; // fallback
+        return "You";
     }
 
 
     private void loadcontact(ContactViewHolder holder, ContactModel contact, int position) {
         if (contact.isAlreadyRegistered() && contact.getUserId() != null && !contact.getUserId().isEmpty()) {
 
-            // Placeholder first
+
             Glide.with(context)
                     .load(R.drawable.profile_icon)
                     .placeholder(R.drawable.profile_icon)
@@ -347,7 +318,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                     .child(contact.getUserId())
                     .child("profilePicBase64");
 
-            // 🔹 Real-time updates for profile icon only
+
             userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -394,7 +365,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                     .child(contact.getUserId())
                     .child("profilePicBase64");
 
-            // Fetch once only when user clicks
+
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -432,8 +403,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         }
     }
     private File saveBitmapToCache(Bitmap bitmap) {
-        File cacheDir = context.getCacheDir(); // app's cache folder
-        File file = new File(cacheDir, "profile_temp.jpg"); // temp file
+        File cacheDir = context.getCacheDir();
+        File file = new File(cacheDir, "profile_temp.jpg");
 
         try (FileOutputStream out = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
@@ -444,7 +415,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         }
         return null;
     }
-    // Open full-screen profile view activity
+
     private void openFullScreenProfile(File file) {
         Uri uri = Uri.fromFile(file);
         Intent intent = new Intent(context, Full_screen_profile.class);
@@ -452,7 +423,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         context.startActivity(intent);
     }
 
-    // Open full-screen with default icon
+
     private void openDefaultFullScreen() {
         Intent intent = new Intent(context, Full_screen_profile.class);
         intent.putExtra("imagePath", Uri.parse("android.resource://" + context.getPackageName() + "/" + R.drawable.profile_icon).toString());

@@ -42,7 +42,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
     private final DatabaseReference realtimeDb = FirebaseDatabase.getInstance().getReference("users");
     private ListenerRegistration chatListener;
     private HashMap<String, String> contactMap = new HashMap<>();
-    // Cache: receiverId -> Base64 profile
     private final HashMap<String, String> profileCache = new HashMap<>();
 
 
@@ -66,10 +65,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         ChatItem item = chatList.get(position);
         holder.chatTitle.setText(item.getName());
         holder.chatPreview.setText(item.getLastMessage());
-
+        String displayName = item.getName();
         String currentUserId = FirebaseAuth.getInstance().getUid();
         String receiverId = item.getReceiverId();
-
+        if (receiverId != null && receiverId.equals(currentUserId)) {
+            if (!displayName.endsWith(" (You)")) {
+                displayName = displayName + " (You)";
+            }
+        }
         if (receiverId != null && !receiverId.isEmpty()) {
             String chatId = receiverId.compareTo(currentUserId) < 0 ?
                     receiverId + "_" + currentUserId :
@@ -84,7 +87,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     .addSnapshotListener((snapshot, e) -> {
                         if (e != null) return;
 
-                        // Check receiver presence/currentChat to hide unseen when BOTH users are in the chat
                         DatabaseReference presRef = FirebaseDatabase.getInstance()
                                 .getReference("presence").child(receiverId);
 
@@ -115,7 +117,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                                 holder.chatTitle.setTypeface(null, Typeface.NORMAL);
                             }
                         }).addOnFailureListener(ex -> {
-                            // On failure, fallback to existing behavior
+
                             if (ChatAdapter.isChatOpen && receiverId.equals(Message_layout.currentOpenChatUserId)) {
                                 holder.unseenmessages.setVisibility(View.GONE);
                                 holder.chatTitle.setTypeface(null, Typeface.NORMAL);
@@ -139,7 +141,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         Context context = holder.itemView.getContext();
         String receiverIdForPic = item.getReceiverId();
 
-        /* -------------------- CASE 1: Memory cache -------------------- */
+
         if (base64 != null && !base64.isEmpty()) {
 
             try {
@@ -157,9 +159,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
             }
 
         }
-        /* -------------------- CASE 2: SharedPreferences cache -------------------- */
-        else {
 
+        else {
             SharedPreferences prefs =
                     context.getSharedPreferences("UserCache", Context.MODE_PRIVATE);
 
@@ -167,7 +168,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     prefs.getString(receiverIdForPic + "_profile_pic", null);
 
             if (cachedPic != null && !cachedPic.isEmpty()) {
-
                 try {
                     byte[] decoded = Base64.decode(cachedPic, Base64.DEFAULT);
 
@@ -183,7 +183,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 }
 
             }
-            /* -------------------- CASE 3: Firebase fetch -------------------- */
+
             else {
 
                 holder.chatIcon.setImageResource(R.drawable.profile_icon);
@@ -212,7 +212,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                                             .circleCrop()
                                             .into(holder.chatIcon);
 
-                                    //  SAVE INTO SHARED PREFERENCES CACHE
                                     ((SharedPreferences) prefs).edit()
                                             .putString(receiverIdForPic + "_profile_pic", fetchedBase64)
                                             .apply();
@@ -228,15 +227,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                 currentUserId + "_" + receiverId;
 
         holder.chatinfo.setOnClickListener(v -> {
-
-            // Prevent crash for unknown/invalid users
             if (receiverId == null || receiverId.trim().isEmpty()) {
                 Toast.makeText(v.getContext(), "Cannot open chat: invalid user", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //Context context = holder.itemView.getContext();
-
-            // 🔄 Fetch receiver phone safely
             FirebaseFirestore.getInstance().collection("users")
                     .document(receiverId)
                     .get()
@@ -245,8 +239,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                                 ? doc.getString("phone") : "Unknown";
 
                         receiverphonenumber = receiverPhone;
-
-                        // 🚀 Open chat instantly with correct phone
                         if (item.getReceiverId() == null || item.getReceiverId().trim().isEmpty()) {
                             Toast.makeText(v.getContext(), "Chat unavailable", Toast.LENGTH_SHORT).show();
                             return;
@@ -267,11 +259,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
                     .addOnFailureListener(e -> {
                         openMessageLayout(context, item, "Unknown");
                     });
-                    //Message_layout.isinMessageLayout=true;
         });
 
         holder.chatIcon.setOnClickListener(v -> {
-           // Context context = holder.itemView.getContext();
             if (context instanceof MainPage) {
                 ((MainPage) context).showContactOverlay(item.getName(), item.getReceiverId(), item.getIconResId());
             }
@@ -326,9 +316,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> im
         intent.putExtra("contactName", item.getName());
         intent.putExtra("contactPhone", receiverPhone);
         intent.putExtra("receiverId", item.getReceiverId());
-        //intent.putExtra("profilePicBase64", item.getIconResId());
-
-        //  REQUIRED for Android 9
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         context.startActivity(intent);

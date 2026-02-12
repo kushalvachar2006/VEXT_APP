@@ -56,7 +56,7 @@ public class CallAdapter extends RecyclerView.Adapter<CallAdapter.CallViewHolder
                         String name = userDoc.getString("name");
                         if (name != null && !name.isEmpty()) {
                             holder.callName.setText(name);
-                            item.setCallName(name); // Update item for consistency
+                            item.setCallName(name);
                         }
                     });
         } else {
@@ -93,7 +93,7 @@ public class CallAdapter extends RecyclerView.Adapter<CallAdapter.CallViewHolder
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String base64 = snapshot.getValue(String.class);
                     if (base64 != null && !base64.isEmpty()) {
-                        item.setProfilePicBase64(base64); // Cache for future use
+                        item.setProfilePicBase64(base64);
                         try {
                             byte[] decoded = Base64.decode(base64, Base64.DEFAULT);
                             Bitmap bitmap = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);

@@ -52,15 +52,15 @@ public class IntroPage extends AppCompatActivity {
                     + ", uid=" + notificationUid + ", chatId=" + notificationChatId);
         }
 
-        //  CRITICAL FIX: Handle notification immediately without animation
+
         if ( isFromNotification && notificationUid != null && notificationChatId != null) {
             android.util.Log.d("IntroPage", "Opened from notification → navigating to chat");
-            // Skip animations and go directly to chat
+
             handleNotificationNavigation();
-            return; //  IMPORTANT: Return here to prevent animation flow
+            return;
         }
 
-        //  Normal app launch - show splash animation
+
         android.util.Log.d("IntroPage", "Normal app launch → showing splash");
         Animation rootFadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         rootLayout.startAnimation(rootFadeIn);
@@ -68,7 +68,7 @@ public class IntroPage extends AppCompatActivity {
     }
 
     private void handleNotificationNavigation() {
-        // Check if user is logged in
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             android.util.Log.d("IntroPage", "User not logged in, redirecting to login");
@@ -79,7 +79,7 @@ public class IntroPage extends AppCompatActivity {
 
         android.util.Log.d("IntroPage", "Fetching user data for: " + notificationUid);
 
-        // User is logged in, fetch data from Firestore
+
         db.collection("users")
                 .document(notificationUid)
                 .get()
@@ -87,45 +87,45 @@ public class IntroPage extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         android.util.Log.d("IntroPage", "User document found, opening chat");
 
-                        // Read values from Firestore
+
                         String contactName = documentSnapshot.getString("contactname");
                         String receiverPhone = documentSnapshot.getString("phone");
                         String profilePicBase64 = documentSnapshot.getString("profilePicBase64");
 
-                        // If contactname is null, use phone as fallback
+
                         if (contactName == null || contactName.isEmpty()) {
                             contactName = receiverPhone;
                         }
 
-                        // If still null, use "Unknown"
+
                         if (contactName == null || contactName.isEmpty()) {
                             contactName = "Unknown User";
                         }
 
                         android.util.Log.d("IntroPage", "Opening Message_layout with: " + contactName);
 
-                        // Open Message_layout activity
+
                         Intent chatIntent = new Intent(IntroPage.this, Message_layout.class);
                         chatIntent.putExtra("contactName", contactName);
                         chatIntent.putExtra("contactPhone", receiverPhone);
                         chatIntent.putExtra("receiverId", notificationUid);
                         chatIntent.putExtra("profilePicBase64", profilePicBase64);
                         chatIntent.putExtra("chatId", notificationChatId);
-                        //  Use NEW_TASK to ensure proper navigation
+
                         chatIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         startActivity(chatIntent);
                         finish();
                     } else {
                         android.util.Log.d("IntroPage", "User document not found, going to MainPage");
-                        // If user doesn't exist in Firestore, navigate to MainPage
+
                         startActivity(new Intent(IntroPage.this, MainPage.class));
                         finish();
                     }
                 })
                 .addOnFailureListener(e -> {
                     android.util.Log.e("IntroPage", "Failed to fetch user data", e);
-                    // If fetch fails, navigate to MainPage
+
                     startActivity(new Intent(IntroPage.this, MainPage.class));
                     finish();
                 });
@@ -134,7 +134,7 @@ public class IntroPage extends AppCompatActivity {
     private void sequentialFadeIn() {
         Animation fadeItem = AnimationUtils.loadAnimation(this, R.anim.fade_in_item);
 
-        // Logo first
+
         imgLogo.setVisibility(View.INVISIBLE);
         txtPoweredBy.setVisibility(View.INVISIBLE);
         imgKVA.setVisibility(View.INVISIBLE);
@@ -144,37 +144,37 @@ public class IntroPage extends AppCompatActivity {
             imgLogo.startAnimation(fadeItem);
         }, 300);
 
-        // “Powered by” text
+
         new Handler().postDelayed(() -> {
             txtPoweredBy.setVisibility(View.VISIBLE);
             txtPoweredBy.startAnimation(fadeItem);
-        }, 900); // 600ms after logo
+        }, 900);
 
-        // KVA logo
+
         new Handler().postDelayed(() -> {
             imgKVA.setVisibility(View.VISIBLE);
             imgKVA.startAnimation(fadeItem);
-        }, 1500); // 600ms after text
+        }, 1500);
 
-        // After all animations, check Firebase user and navigate
-        new Handler().postDelayed(() -> checkFirebaseUser(), 1500); // 1.5s splash
+
+        new Handler().postDelayed(() -> checkFirebaseUser(), 1500);
     }
 
     private void checkFirebaseUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             if (isInternetAvailable()) {
-                // Refresh from server
+
                 currentUser.reload().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        startFadeOutTransition(true); // valid user
+                        startFadeOutTransition(true);
                     } else {
                         mAuth.signOut();
-                        startFadeOutTransition(false); // account deleted/invalid
+                        startFadeOutTransition(false);
                     }
                 });
             } else {
-                // Offline → trust cached session
+
                 startFadeOutTransition(true);
             }
         } else {
@@ -199,6 +199,6 @@ public class IntroPage extends AppCompatActivity {
                     new Intent(IntroPage.this, TermsAndCondition.class);
             startActivity(intent);
             finish();
-        }, 500); // match fade-out duration
+        }, 500);
     }
 }

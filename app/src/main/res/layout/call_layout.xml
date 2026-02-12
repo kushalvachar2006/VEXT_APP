@@ -4,16 +4,14 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#F5F5F5">
 
-    <!-- 🔹 Remote video (video call mode only) -->
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/remote_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible" />
 
-    <!-- 🔹 Local video preview (top-right corner, video call mode only) -->
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/local_view"
         android:layout_width="120dp"
@@ -23,7 +21,6 @@
         android:elevation="8dp"
         android:visibility="visible" />
 
-    <!-- 🔹 Audio call mode container -->
     <LinearLayout
         android:id="@+id/audio_call_container"
         android:layout_width="match_parent"
@@ -31,10 +28,9 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="32dp"
-        android:background="#101010"
+        android:background="#FFFFFF"
         android:visibility="gone">
 
-        <!-- 📞 Receiver image -->
         <ImageView
             android:id="@+id/receiver_image"
             android:layout_width="140dp"
@@ -46,46 +42,41 @@
             android:padding="6dp"
             android:contentDescription="Receiver image" />
 
-        <!-- Receiver name -->
         <TextView
             android:id="@+id/receiver_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Receiver Name"
-            android:textColor="#FFFFFF"
+            android:textColor="#212121"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="4dp" />
 
-        <!-- Receiver phone -->
         <TextView
             android:id="@+id/receiver_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="+91 98765 43210"
-            android:textColor="#AAAAAA"
+            android:textColor="#757575"
             android:textSize="14sp"
             android:layout_marginBottom="32dp" />
 
-        <!-- Call status (connecting / ringing / ongoing) -->
         <TextView
             android:id="@+id/call_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Connecting..."
-            android:textColor="#BBBBBB"
+            android:textColor="#616161"
             android:textSize="16sp"
             android:layout_marginBottom="48dp" />
 
-        <!-- 🔘 Call Controls -->
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Mute button -->
             <ImageButton
                 android:id="@+id/btn_mute"
                 android:layout_width="60dp"
@@ -94,9 +85,8 @@
                 android:src="@drawable/micbtn"
                 android:scaleType="centerInside"
                 android:contentDescription="Mute"
-                app:tint="#FFFFFF" />
+                app:tint="#424242" />
 
-            <!-- End call button -->
             <ImageButton
                 android:id="@+id/btn_end_call"
                 android:layout_width="76dp"
@@ -109,20 +99,18 @@
                 android:contentDescription="End call"
                 app:tint="#FFFFFF" />
 
-            <!-- Speaker button -->
             <ImageButton
                 android:id="@+id/btn_speaker"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_volume_up"
+                android:src="@drawable/ic_volume_up_active"
                 android:scaleType="centerInside"
                 android:contentDescription="Speaker"
-                app:tint="#FFFFFF" />
+                app:tint="#424242" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 🔹 Overlay for receiver info (video mode) -->
     <LinearLayout
         android:id="@+id/receiver_info_overlay"
         android:layout_width="match_parent"
@@ -131,7 +119,7 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        android:background="#33000000"
+        android:background="#E6FFFFFF"
         android:visibility="visible">
 
         <ImageView
@@ -154,7 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Receiver Name"
-                android:textColor="#FFFFFF"
+                android:textColor="#212121"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -163,12 +151,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="+91 98765 43210"
-                android:textColor="#CCCCCC"
+                android:textColor="#616161"
                 android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 🔹 Bottom control bar (for video calls) -->
     <LinearLayout
         android:id="@+id/video_controls"
         android:layout_width="match_parent"
@@ -178,7 +165,7 @@
         android:orientation="horizontal"
         android:paddingBottom="24dp"
         android:paddingTop="12dp"
-        android:background="#33000000"
+        android:background="#E6FFFFFF"
         android:visibility="visible">
 
         <ImageButton
@@ -189,7 +176,7 @@
             android:src="@drawable/micbtn"
             android:scaleType="centerInside"
             android:contentDescription="Mute"
-            app:tint="#FFFFFF" />
+            app:tint="#424242" />
 
         <ImageButton
             android:id="@+id/btn_end_video_call"
@@ -211,7 +198,7 @@
             android:src="@drawable/ic_switch_camera"
             android:scaleType="centerInside"
             android:contentDescription="Switch camera"
-            app:tint="#FFFFFF" />
+            app:tint="#424242" />
     </LinearLayout>
 
 </FrameLayout>

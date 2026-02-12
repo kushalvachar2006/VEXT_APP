@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -56,6 +58,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,6 +99,10 @@ public class MainPage extends AppCompatActivity {
     private void loadContactsForNameResolution() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
+
+            chats_layout.setVisibility(View.GONE);
+            plusnewchat.setVisibility(View.VISIBLE);
+            plusnewchat.setText("Press + for new chat with your contact");
             loadChatsFromFirestore();
             return;
         }
@@ -166,13 +174,13 @@ public class MainPage extends AppCompatActivity {
     private void checkAndRequestPermissions() {
         List<String> permissionNeeded = new ArrayList<>();
 
-        //  Check READ_CONTACTS permission
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
             permissionNeeded.add(Manifest.permission.READ_CONTACTS);
         }
 
-        //  Android 13+ (TIRAMISU) - Use granular media permissions
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -187,7 +195,7 @@ public class MainPage extends AppCompatActivity {
                 permissionNeeded.add(Manifest.permission.READ_MEDIA_AUDIO);
             }
 
-            //  FIXED: Add POST_NOTIFICATIONS to the list instead of requesting separately
+
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
                 permissionNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
@@ -199,7 +207,7 @@ public class MainPage extends AppCompatActivity {
                 permissionNeeded.add(Manifest.permission.RECORD_AUDIO);
             }
         } else {
-            //  Android 12 and below - Use READ_EXTERNAL_STORAGE
+
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 permissionNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -209,7 +217,7 @@ public class MainPage extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     permissionNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
         }
-        // Add this to your MainActivity or IntroPage onCreate()
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requestPermissions(new String[]{
                         Manifest.permission.POST_NOTIFICATIONS
@@ -223,7 +231,7 @@ public class MainPage extends AppCompatActivity {
                     intent.setData(Uri.parse("package:" + getPackageName()));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    // Optional: Show a toast explaining why
+
                     Toast.makeText(this,
                             "Please enable Full Screen Intent to receive incoming calls",
                             Toast.LENGTH_LONG).show();
@@ -231,7 +239,7 @@ public class MainPage extends AppCompatActivity {
                 }
             }
 
-            // Request battery optimization exemption
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                 if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
@@ -253,7 +261,7 @@ public class MainPage extends AppCompatActivity {
         }
 
     }
-    //  Handle permission results
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -279,14 +287,14 @@ public class MainPage extends AppCompatActivity {
                 Log.d("Permissions", "All permissions granted");
             } else {
                 Log.d("Permissions", "Some permissions denied: " + deniedPermissions.toString());
-                //  Show explanation or guide user to settings
+
                 showPermissionDeniedDialog(deniedPermissions.toString());
             }
         }
     }
 
 
-    // Show dialog when permissions are denied
+
     private void showPermissionDeniedDialog(String deniedPermissions) {
         new AlertDialog.Builder(this)
                 .setTitle("Permissions Required")
@@ -294,7 +302,7 @@ public class MainPage extends AppCompatActivity {
                         + deniedPermissions
                         + "\nPlease grant these permissions in Settings.")
                 .setPositiveButton("Open Settings", (dialog, which) -> {
-                    // Open app settings
+
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                     Uri uri = Uri.fromParts("package", getPackageName(), null);
                     intent.setData(uri);
@@ -309,7 +317,7 @@ public class MainPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_page);
 
-        // --- Init Views ---
+
         vext_app = findViewById(R.id.vextapp);
         chatbtn = findViewById(R.id.chats_btn);
         callbtn = findViewById(R.id.phone_btn);
@@ -358,7 +366,7 @@ public class MainPage extends AppCompatActivity {
             }
         });
 
-        // --- Gradient for app name ---
+
         Paint paint = vext_app.getPaint();
         float width = paint.measureText(vext_app.getText().toString());
         Shader shader = new LinearGradient(
@@ -369,7 +377,7 @@ public class MainPage extends AppCompatActivity {
         vext_app.getPaint().setShader(shader);
         vext_app.invalidate();
 
-        // --- Menu ---
+
         menu_content.bringToFront();
         overlay = findViewById(R.id.overlay_view);
         menu_icon.setOnClickListener(v -> {
@@ -394,34 +402,34 @@ public class MainPage extends AppCompatActivity {
             }
         });
 
-        // --- Profile & Signout ---
+
         viewprofile.setOnClickListener(v -> startActivity(new Intent(MainPage.this, ProfilePage.class)));
         signout.setOnClickListener(v -> signOutUser());
 
-        // --- Bottom Nav default: Chats ---
+
         chatbtn.setBackgroundResource(R.drawable.chats_selected);
         chats.setTypeface(null, Typeface.BOLD);
         chatbtn.setSelected(true);
         callbtn.setSelected(false);
         search.setHint("Search Chats...");
 
-        // --- Search Bar Behavior ---
+
         setupSearchBar();
 
-        // --- RecyclerViews ---
+
         chats_layout.setHasFixedSize(true);
         chats_layout.setLayoutManager(new LinearLayoutManager(this));
 
         calls_layout.setHasFixedSize(true);
         calls_layout.setLayoutManager(new LinearLayoutManager(this));
 
-        // --- Sample Data ---
+
         chatAdapter = new ChatAdapter(chatList);
         chats_layout.setAdapter(chatAdapter);
 
         calls_layout.setAdapter(new CallAdapter(this, callList));
 
-        // --- Bottom nav clicks ---
+
         chatbtn.setOnClickListener(v -> selectChatsTab(chatList));
         chats.setOnClickListener(v -> chatbtn.performClick());
 
@@ -430,7 +438,7 @@ public class MainPage extends AppCompatActivity {
 
         newchat.setOnClickListener(v -> startActivity(new Intent(MainPage.this, ContactView.class)));
 
-        //listenForIncomingCalls();
+
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(currentUserId)
@@ -443,10 +451,10 @@ public class MainPage extends AppCompatActivity {
                     }
                 });
 
-        // Load call logs in real time
+
         listenForCallLogs();
 
-        // Keep chat names refreshed if user display names or phones update in Firestore
+
         listenForUserNamePhoneUpdates();
 
 
@@ -486,7 +494,7 @@ public class MainPage extends AppCompatActivity {
             String notificationChatId = intent.getStringExtra("chatId");
             String senderName = intent.getStringExtra("senderName");
 
-            // Fetch user data from Firestore
+
             db.collection("users")
                     .document(notificationUid)
                     .get()
@@ -496,17 +504,17 @@ public class MainPage extends AppCompatActivity {
                             String receiverPhone = documentSnapshot.getString("phone");
                             String profilePicBase64 = documentSnapshot.getString("profilePicBase64");
 
-                            // Use senderName from notification if contactName is not available
+
                             if (contactName == null || contactName.isEmpty()) {
                                 contactName = senderName != null ? senderName : receiverPhone;
                             }
 
-                            // If still null, fallback to phone or "Unknown"
+
                             if (contactName == null || contactName.isEmpty()) {
                                 contactName = receiverPhone != null ? receiverPhone : "Unknown User";
                             }
 
-                            // Navigate to Message_layout
+
                             Intent messageIntent = new Intent(MainPage.this, Message_layout.class);
                             messageIntent.putExtra("contactName", contactName);
                             messageIntent.putExtra("contactPhone", receiverPhone);
@@ -525,7 +533,11 @@ public class MainPage extends AppCompatActivity {
     private void loadChatsFromFirestore() {
         String currentUserId = FirebaseAuth.getInstance().getUid();
         Map<String, String> userProfileCache = new LinkedHashMap<>();
+        chatList.clear();
+        chatAdapter.notifyDataSetChanged();
 
+        chats_layout.setVisibility(View.GONE);
+        plusnewchat.setVisibility(View.VISIBLE);
         fetchChats(userProfileCache, currentUserId);
 
         FirebaseDatabase.getInstance().getReference("users")
@@ -544,84 +556,201 @@ public class MainPage extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                 });
     }
-
-
     private void fetchChats(Map<String, String> userProfileCache, String currentUserId) {
+
         db.collection("chats")
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .whereArrayContains("participants", currentUserId)
                 .addSnapshotListener((querySnapshot, error) -> {
-                    if (error != null || querySnapshot == null) return;
+
+                    if (error != null || querySnapshot == null) {
+                        Log.e("FetchChats", "Error or null snapshot: " + (error != null ? error.getMessage() : "null"));
+                        runOnUiThread(() -> {
+                            if (chatList.isEmpty()) {
+                                chats_layout.setVisibility(View.GONE);
+                                plusnewchat.setVisibility(View.VISIBLE);
+                                plusnewchat.setText("Press + for new chat with your contact");
+                            }
+                        });
+                        return;
+                    }
+
+                    Log.d("FetchChats", "Documents found: " + querySnapshot.size());
 
                     Map<String, ChatItem> tempMap = new LinkedHashMap<>();
 
-                    if (querySnapshot.isEmpty()) {
-                        chatList.clear();
-                        chatAdapter.notifyDataSetChanged();
-                        chats_layout.setVisibility(View.GONE);
-                        plusnewchat.setText("Press + for new chat with your contact");
-                        plusnewchat.setVisibility(View.VISIBLE);
-                        calls_layout.setVisibility(View.GONE);
-                        return;
-                    }
-                    boolean hasMatchingChat = false;
-
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        String chatId = doc.getId();
-                        if (!chatId.contains(currentUserId)) {
-                            continue;
-                        }
-                        // If we reach here, the chatId matched the user
-                        hasMatchingChat = true;
+
+                        Log.d("FetchChats", "Processing doc: " + doc.getId());
 
                         List<String> participants = (List<String>) doc.get("participants");
-                        if (participants == null || !participants.contains(currentUserId)) continue;
 
-                        String lastMessage = doc.getString("lastMessage");
-                        String receiverId = participants.size() == 1 && participants.get(0).equals(currentUserId)
-                                ? currentUserId
-                                : (participants.get(0).equals(currentUserId)
-                                ? participants.get(1)
-                                : participants.get(0));
-
-                        String displayName = null;
-                        Map<String, Object> displayNamesMap = (Map<String, Object>) doc.get("displayNames");
-                        if (displayNamesMap != null && displayNamesMap.containsKey(currentUserId)) {
-                            Map<String, Object> currentUserView = (Map<String, Object>) displayNamesMap.get(currentUserId);
-                            if (currentUserView != null && currentUserView.containsKey(receiverId)) {
-                                displayName = (String) currentUserView.get(receiverId);
-                            }
-                        }
-
-                        if (displayName == null || displayName.isEmpty()) {
-                            // Try local contact name first
-                            String localName = ContactAdapter.uidToLocalName.get(receiverId);
-                            if (localName != null && !localName.isEmpty()) {
-                                loadChatItem(doc, receiverId, localName, lastMessage, tempMap, userProfileCache);
-                                continue;
-                            }
-
-                            // Otherwise, fetch from Firestore once
-                            db.collection("users").document(receiverId).get()
-                                    .addOnSuccessListener(userDoc -> {
-                                        String receiverPhone = userDoc.getString("phone");
-                                        String finalDisplayName = receiverPhone != null ? receiverPhone : "Unknown";
-                                        loadChatItem(doc, receiverId, finalDisplayName, lastMessage, tempMap, userProfileCache);
-                                    });
+                        if (participants == null) {
+                            Log.e("FetchChats", "No participants found");
                             continue;
                         }
 
-                        loadChatItem(doc, receiverId, displayName, lastMessage, tempMap, userProfileCache);
+                        String receiverId = null;
+                        if (participants.size() == 1 && participants.get(0).equals(currentUserId)) {
+                            receiverId = currentUserId;
+                        } else if (participants.size() == 2) {
+
+                            for (String id : participants) {
+                                if (!id.equals(currentUserId)) {
+                                    receiverId = id;
+                                    break;
+                                }
+                            }
+                        }
+                        if (receiverId == null) {
+                            Log.e("FetchChats", "No receiverId found");
+                            continue;
+                        }
+
+                        Log.d("FetchChats", "ReceiverID: " + receiverId);
+                        Log.d("FetchChats", "CurrentUserID: " + currentUserId);
+
+                        String lastMessage = "No messages yet";
+                        long timestamp = 0;
+
+
+                        Long globalTimestamp = doc.getLong("timestamp");
+                        if (globalTimestamp != null) {
+                            timestamp = globalTimestamp;
+                        }
+
+
+                        Map<String, Object> lastMessagesMap = (Map<String, Object>) doc.get("lastMessages");
+
+                        if (lastMessagesMap != null && lastMessagesMap instanceof Map) {
+                            Log.d("FetchChats", "Found nested lastMessages map: " + lastMessagesMap.keySet());
+
+
+                            Object currentUserDataObj = lastMessagesMap.get(currentUserId);
+                            Object receiverDataObj = lastMessagesMap.get(receiverId);
+
+                            Map<String, Object> currentUserData = null;
+                            Map<String, Object> receiverData = null;
+
+                            if (currentUserDataObj instanceof Map) {
+                                currentUserData = (Map<String, Object>) currentUserDataObj;
+                            }
+                            if (receiverDataObj instanceof Map) {
+                                receiverData = (Map<String, Object>) receiverDataObj;
+                            }
+
+                            Log.d("FetchChats", "Current user data: " + currentUserData);
+                            Log.d("FetchChats", "Receiver data: " + receiverData);
+
+
+                            Map<String, Object> messageData = currentUserData != null ? currentUserData : receiverData;
+
+                            if (messageData != null) {
+                                Object textObj = messageData.get("text");
+                                Object timeObj = messageData.get("timestamp");
+
+                                Log.d("FetchChats", "Text object: " + textObj);
+                                Log.d("FetchChats", "Time object: " + timeObj);
+
+                                if (textObj != null && !textObj.toString().trim().isEmpty()) {
+                                    lastMessage = textObj.toString();
+                                }
+
+                                if (timeObj instanceof Long) {
+                                    timestamp = (Long) timeObj;
+                                } else if (timeObj instanceof Double) {
+                                    timestamp = ((Double) timeObj).longValue();
+                                } else if (timeObj instanceof Integer) {
+                                    timestamp = ((Integer) timeObj).longValue();
+                                }
+                            }
+                        } else {
+
+                            Log.w("FetchChats", "lastMessages is not a nested map, trying flat structure");
+
+                            Map<String, Object> data = doc.getData();
+
+                            if (data != null) {
+                                String currentUserTextKey = "lastMessages." + currentUserId + ".text";
+                                String currentUserTimeKey = "lastMessages." + currentUserId + ".timestamp";
+                                String receiverTextKey = "lastMessages." + receiverId + ".text";
+                                String receiverTimeKey = "lastMessages." + receiverId + ".timestamp";
+
+                                Log.d("FetchChats", "Looking for flat keys:");
+                                Log.d("FetchChats", "  - " + currentUserTextKey);
+                                Log.d("FetchChats", "Available keys: " + data.keySet());
+
+                                Object currentUserText = data.get(currentUserTextKey);
+                                Object currentUserTime = data.get(currentUserTimeKey);
+                                Object receiverText = data.get(receiverTextKey);
+                                Object receiverTime = data.get(receiverTimeKey);
+
+
+                                if (currentUserText != null && !currentUserText.toString().trim().isEmpty()) {
+                                    lastMessage = currentUserText.toString();
+                                    if (currentUserTime instanceof Long) {
+                                        timestamp = (Long) currentUserTime;
+                                    } else if (currentUserTime instanceof Double) {
+                                        timestamp = ((Double) currentUserTime).longValue();
+                                    } else if (currentUserTime instanceof Integer) {
+                                        timestamp = ((Integer) currentUserTime).longValue();
+                                    }
+                                }
+
+                                else if (receiverText != null && !receiverText.toString().trim().isEmpty()) {
+                                    lastMessage = receiverText.toString();
+                                    if (receiverTime instanceof Long) {
+                                        timestamp = (Long) receiverTime;
+                                    } else if (receiverTime instanceof Double) {
+                                        timestamp = ((Double) receiverTime).longValue();
+                                    } else if (receiverTime instanceof Integer) {
+                                        timestamp = ((Integer) receiverTime).longValue();
+                                    }
+                                }
+                            }
+                        }
+
+                        Log.d("FetchChats", "Final lastMessage: " + lastMessage);
+                        Log.d("FetchChats", "Final timestamp: " + timestamp);
+
+                        String displayName = ContactAdapter.uidToLocalName.get(receiverId);
+
+                        if (displayName == null || displayName.isEmpty()) {
+                            displayName = receiverId;
+                        }
+                        if (receiverId.equals(currentUserId)) {
+                            displayName = displayName + " (You)";
+                        }
+                        String profilePic = userProfileCache.get(receiverId);
+
+                        ChatItem item = new ChatItem(displayName, lastMessage, profilePic, receiverId);
+                        item.setTimestamp(timestamp);
+
+                        tempMap.put(receiverId, item);
                     }
-                    if (!hasMatchingChat) {
-                        chatList.clear();
-                        chatAdapter.notifyDataSetChanged();
-                        chats_layout.setVisibility(View.GONE);
-                        plusnewchat.setText("Press + for new chat with your contact");
-                        plusnewchat.setVisibility(View.VISIBLE);
-                        calls_layout.setVisibility(View.GONE);
-                    }
+
+                    chatList.clear();
+                    chatList.addAll(tempMap.values());
+
+
+                    chatList.sort((a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
+
+                    chatAdapter.updateFullList(chatList);
+                    chatAdapter.notifyDataSetChanged();
+
+
+                    runOnUiThread(() -> {
+                        if (chatList.isEmpty()) {
+                            chats_layout.setVisibility(View.GONE);
+                            plusnewchat.setVisibility(View.VISIBLE);
+                            plusnewchat.setText("Press + for new chat with your contact");
+                        } else {
+                            chats_layout.setVisibility(View.VISIBLE);
+                            plusnewchat.setVisibility(View.GONE);
+                        }
+                    });
                 });
     }
+
 
 
     private void loadChatItem(DocumentSnapshot doc, String receiverId, String displayName,
@@ -637,7 +766,7 @@ public class MainPage extends AppCompatActivity {
             }
         }
 
-        // Use cache if Firestore didn’t have it
+
         if (profilePicBase64 == null || profilePicBase64.isEmpty()) {
             profilePicBase64 = userProfileCache.get(receiverId);
         }
@@ -652,14 +781,20 @@ public class MainPage extends AppCompatActivity {
         chatList.clear();
         chatList.addAll(tempMap.values());
 
-        //  Sort by latest timestamp
-        chatList.sort((a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
+        chatList.sort((a, b) ->
+                Long.compare(b.getTimestamp(), a.getTimestamp()));
 
         chatAdapter.updateFullList(chatList);
         chatAdapter.notifyDataSetChanged();
-        chats_layout.setVisibility(View.VISIBLE);
-        plusnewchat.setVisibility(View.GONE);
+
+        chats_layout.setVisibility(chatList.isEmpty()
+                ? View.GONE : View.VISIBLE);
+
+        plusnewchat.setVisibility(chatList.isEmpty()
+                ? View.VISIBLE : View.GONE);
+
         calls_layout.setVisibility(View.GONE);
+
     }
 
     public void showContactOverlay(String name, String userId, String profileBase64) {
@@ -673,7 +808,7 @@ public class MainPage extends AppCompatActivity {
         username.setText(name);
         userphonenumber.setText("Loading...");
 
-        // Load profile pic (existing logic)
+
         SharedPreferences prefs = getSharedPreferences("UserCache", MODE_PRIVATE);
         String cachedPic = prefs.getString(userId + "_profile_pic", null);
 
@@ -684,14 +819,11 @@ public class MainPage extends AppCompatActivity {
             profile_view.setImageResource(R.drawable.profile_icon);
         }
         profile_view.setOnClickListener(v -> {
-            Intent i = new Intent(MainPage.this, Full_screen_profile.class);
-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.profile_icon);
-            i.putExtra("imagePath", uri.toString());
-            startActivity(i);
+            openContactFullScreen(userId);
         });
 
 
-        //  Fetch phone once (needed for Message_layout)
+
         FirebaseFirestore.getInstance().collection("users")
                 .document(userId)
                 .get()
@@ -699,7 +831,7 @@ public class MainPage extends AppCompatActivity {
                     String phone = doc.getString("phone");
                     userphonenumber.setText(phone != null ? phone : "Unknown");
 
-                    //  MESSAGE BUTTON — HANDLED HERE
+
                     message_btn_layout.setOnClickListener(v -> {
                         Intent i = new Intent(MainPage.this, Message_layout.class);
                         i.putExtra("receiverId", userId);
@@ -710,7 +842,7 @@ public class MainPage extends AppCompatActivity {
                     msgbtntext.setOnClickListener(v->message_btn_layout.performClick());
                     msgbtn.setOnClickListener(v->message_btn_layout.performClick());
 
-                    // CALL BUTTON (optional, clean)
+
                     call_btn_layout.setOnClickListener(v -> {
                         call_options_layout.setVisibility(
                                 call_options_layout.getVisibility() == View.VISIBLE
@@ -745,7 +877,7 @@ public class MainPage extends AppCompatActivity {
 
                 });
 
-        //  Close overlay
+
         exitbtn.setOnClickListener(v -> {
             Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_out_bottom);
             contactinfo_layout.startAnimation(slideOut);
@@ -761,6 +893,91 @@ public class MainPage extends AppCompatActivity {
             });
         });
     }
+    private void openContactFullScreen(String userId) {
+
+        if (userId == null || userId.isEmpty()) {
+            openDefaultFullScreen();
+            return;
+        }
+
+
+        SharedPreferences prefs = getSharedPreferences("UserCache", MODE_PRIVATE);
+        String cachedPic = prefs.getString(userId + "_profile_pic", null);
+
+        if (cachedPic != null && !cachedPic.isEmpty()) {
+            try {
+                byte[] decoded = Base64.decode(cachedPic, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+
+                File file = saveBitmapToCache(bitmap);
+                if (file != null) {
+                    openFullScreenProfile(file);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        FirebaseFirestore.getInstance().collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(doc -> {
+
+                    String base64 = doc.getString("profilePicBase64");
+
+                    if (base64 != null && !base64.isEmpty()) {
+                        try {
+                            byte[] decoded = Base64.decode(base64, Base64.DEFAULT);
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+
+                            File file = saveBitmapToCache(bitmap);
+                            if (file != null) {
+                                openFullScreenProfile(file);
+
+
+                                prefs.edit().putString(userId + "_profile_pic", base64).apply();
+                                return;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    openDefaultFullScreen();
+                })
+                .addOnFailureListener(e -> openDefaultFullScreen());
+    }
+    private File saveBitmapToCache(Bitmap bitmap) {
+        File cacheDir = getCacheDir();
+        File file = new File(cacheDir, "profile_temp.jpg");
+
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private void openFullScreenProfile(File file) {
+        Uri uri = Uri.fromFile(file);
+        Intent intent = new Intent(this, Full_screen_profile.class);
+        intent.putExtra("imagePath", uri.toString());
+        startActivity(intent);
+    }
+    private void openDefaultFullScreen() {
+        Intent intent = new Intent(this, Full_screen_profile.class);
+        intent.putExtra(
+                "imagePath",
+                Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.profile_icon).toString()
+        );
+        startActivity(intent);
+    }
+
+
 
 
 

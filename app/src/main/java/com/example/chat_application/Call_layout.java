@@ -141,7 +141,6 @@ public class Call_layout extends AppCompatActivity {
             receiverPhoneStr = intent.getStringExtra("receiverPhone");
             receiverId = intent.getStringExtra("receiverId");
 
-            // NEW: Fetch profile picture from Firebase instead
             fetchReceiverProfile();
 
             callDocRef = db.collection("calls").document(callId);
@@ -167,7 +166,7 @@ public class Call_layout extends AppCompatActivity {
                             receiverProfileBase64 = "";
                         }
 
-                        //  Update UI after profile is loaded
+
                         runOnUiThread(() -> {
                             if (isVideoCall) {
                                 setReceiverInfo(receiverNameOverlay, receiverPhoneOverlay, receiverImageOverlay);
@@ -199,15 +198,15 @@ public class Call_layout extends AppCompatActivity {
                         Manifest.permission.CAMERA,
                         Manifest.permission.RECORD_AUDIO
                 }, PERMISSION_REQUEST);
-                return; //  Will continue in onRequestPermissionsResult
+                return;
             }
         }
 
-        //  Only reaches here if permissions already granted
+
         setupWebRTC();
     }
 
-    //  NEW METHOD: Extracted WebRTC setup
+
     private void setupWebRTC() {
         rtc = new WebRTCHelper(this, localView, remoteView, isVideoCall);
         if (isVideoCall) rtc.startLocalVideo();
@@ -262,12 +261,9 @@ public class Call_layout extends AppCompatActivity {
                     Log.d(TAG, "ICE failed/closed → ending call");
                     runOnUiThread(()->endCall());
                 }
-
-// ⚠️ Do NOT immediately end on DISCONNECTED
                 if (newState == PeerConnection.IceConnectionState.DISCONNECTED) {
                     Log.w(TAG, "ICE temporarily disconnected — waiting for recovery");
 
-                    // Optional: end call only if still disconnected after 10 seconds
                     new Handler().postDelayed(() -> {
                         if (rtc != null) {
                             PeerConnection pc = rtc.getPeerConnection();
@@ -405,10 +401,34 @@ public class Call_layout extends AppCompatActivity {
     }
 
     private void toggleSpeaker() {
+
         isSpeakerOn = !isSpeakerOn;
-        audioManager.setSpeakerphoneOn(isSpeakerOn);
-        btnSpeaker.setImageResource(isSpeakerOn ? R.drawable.ic_volume_up_active : R.drawable.ic_volume_up);
+
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
+        if (isSpeakerOn) {
+            audioManager.setSpeakerphoneOn(true);
+            audioManager.setRouting(
+                    AudioManager.MODE_IN_COMMUNICATION,
+                    AudioManager.ROUTE_SPEAKER,
+                    AudioManager.ROUTE_ALL
+            );
+        } else {
+            audioManager.setSpeakerphoneOn(false);
+            audioManager.setRouting(
+                    AudioManager.MODE_IN_COMMUNICATION,
+                    AudioManager.ROUTE_EARPIECE,
+                    AudioManager.ROUTE_ALL
+            );
+        }
+
+        btnSpeaker.setImageResource(
+                isSpeakerOn
+                        ? R.drawable.ic_volume_up
+                        : R.drawable.ic_volume_up_active
+        );
     }
+
 
     private synchronized void endCall() {
         if (callEnded) return;
@@ -781,7 +801,6 @@ public class Call_layout extends AppCompatActivity {
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioManager.setMicrophoneMute(false);
 
-        //  IMPROVED: Use earpiece for audio calls, speaker for video calls
         audioManager.setSpeakerphoneOn(isVideoCall);
         isSpeakerOn = isVideoCall;
 
@@ -809,7 +828,7 @@ public class Call_layout extends AppCompatActivity {
                 setupWebRTC();
             } else {
                 Log.w(TAG, "Permissions denied");
-                endCall(); //  End call if permissions denied
+                endCall();
             }
         }
     }

@@ -19,17 +19,16 @@ public class CallActionReceiver extends BroadcastReceiver {
         Log.d(TAG, "Received action: " + action + ", callId: " + callId);
 
         if ("ACCEPT_CALL".equals(action) && callId != null) {
-            //  ACCEPT: Navigate to Call_layout
             String callerName = intent.getStringExtra("callerName");
             String callerProfile = intent.getStringExtra("callerProfile");
             boolean isVideoCall = intent.getBooleanExtra("isVideoCall", false);
 
             Log.d(TAG, "Accepting call from notification");
 
-            //  Dismiss notification
+
             dismissNotification(context, notificationId, callId);
 
-            //  Update Firestore first
+
             FirebaseFirestore.getInstance()
                     .collection("calls")
                     .document(callId)
@@ -37,7 +36,7 @@ public class CallActionReceiver extends BroadcastReceiver {
                     .addOnSuccessListener(aVoid -> {
                         Log.d(TAG, "Call accepted via notification");
 
-                        //  Launch Call_layout activity
+
                         Intent callIntent = new Intent(context, Call_layout.class);
                         callIntent.putExtra("callId", callId);
                         callIntent.putExtra("isCaller", false);
@@ -49,16 +48,18 @@ public class CallActionReceiver extends BroadcastReceiver {
                         context.startActivity(callIntent);
                     });
 
-            //  Close IncomingCall activity if it's open
+
             Intent closeIntent = new Intent("CLOSE_INCOMING_CALL");
             closeIntent.putExtra("callId", callId);
             context.sendBroadcast(closeIntent);
+            Intent serviceIntent = new Intent(context, IncomingCallService.class);
+            context.stopService(serviceIntent);
 
         } else if ("DECLINE_CALL".equals(action) && callId != null) {
-            //  DECLINE: Update Firestore and dismiss
+
             Log.d(TAG, "Declining call from notification");
 
-            //  Update Firestore to reject the call
+
             FirebaseFirestore.getInstance()
                     .collection("calls")
                     .document(callId)
@@ -68,14 +69,16 @@ public class CallActionReceiver extends BroadcastReceiver {
                     .addOnFailureListener(e ->
                             Log.e(TAG, "Failed to reject call", e));
 
-            //  Dismiss the notification
+
             dismissNotification(context, notificationId, callId);
 
-            //  Close IncomingCall activity if it's open
+
             Intent closeIntent = new Intent("CLOSE_INCOMING_CALL");
             closeIntent.putExtra("callId", callId);
             closeIntent.putExtra("action", "declined");
             context.sendBroadcast(closeIntent);
+            Intent serviceIntent = new Intent(context, IncomingCallService.class);
+            context.stopService(serviceIntent);
         }
     }
 

@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:padding="12dp">
 
-    <!-- ================= MAIN ROW WRAPPED IN LINEARLAYOUT ================= -->
+
 
     <LinearLayout
         android:id="@+id/main_row_layout"

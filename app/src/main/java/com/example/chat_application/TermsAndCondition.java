@@ -1,8 +1,5 @@
 package com.example.chat_application;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,6 +8,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 public class TermsAndCondition extends AppCompatActivity {
     TextView t_c,t_c_text,privacytext;
@@ -34,11 +34,9 @@ public class TermsAndCondition extends AppCompatActivity {
         String tc=getString(R.string.t_c_conditions_text);
         String privacy=getString(R.string.privacy_condition_text);
 
-//        Code to change HTML text to formatted text
         t_c_text.setText(Html.fromHtml(tc,Html.FROM_HTML_MODE_COMPACT));
         privacytext.setText(Html.fromHtml(privacy,Html.FROM_HTML_MODE_COMPACT));
 
-//        Code to handle all clickables
         t_c.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -54,7 +54,7 @@ public class WebRTCHelper {
         createLocalStream();
     }
 
-    // ✔ Initialize WebRTC factory and EGL context
+
     private void initializePeerConnectionFactory() {
 
         PeerConnectionFactory.InitializationOptions initializationOptions =
@@ -81,7 +81,7 @@ public class WebRTCHelper {
                 .createPeerConnectionFactory();
     }
 
-    // ✔ Create local media stream (audio + video)
+
     private void createLocalStream() {
 
         localStream = factory.createLocalMediaStream("local_stream");
@@ -113,7 +113,6 @@ public class WebRTCHelper {
         }
     }
 
-    // ✔ Try front camera first
     private VideoCapturer createCameraCapturer() {
 
         Camera1Enumerator enumerator = new Camera1Enumerator(false);
@@ -133,7 +132,6 @@ public class WebRTCHelper {
         return null;
     }
 
-    // ✔ Start the local preview
     public void startLocalVideo() {
 
         if (!isVideoCall) return;
@@ -153,16 +151,36 @@ public class WebRTCHelper {
         }
     }
 
-    // ✔ Create peer connection and add stream
+
     public void setupPeerConnection(PeerConnection.Observer observer) {
 
         List<PeerConnection.IceServer> servers = new ArrayList<>();
-        servers.add(PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer());
 
-        peerConnection = factory.createPeerConnection(servers, observer);
+
+        servers.add(
+                PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
+                        .createIceServer()
+        );
+
+
+        servers.add(
+                PeerConnection.IceServer.builder("turn:openrelay.metered.ca:80")
+                        .setUsername("openrelayproject")
+                        .setPassword("openrelayproject")
+                        .createIceServer()
+        );
+
+        PeerConnection.RTCConfiguration config =
+                new PeerConnection.RTCConfiguration(servers);
+
+        config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN;
+        config.continualGatheringPolicy =
+                PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
+
+        peerConnection = factory.createPeerConnection(config, observer);
 
         if (peerConnection == null) {
-            Log.e(TAG, " Failed to create PeerConnection");
+            Log.e(TAG, "Failed to create PeerConnection");
             return;
         }
 
@@ -173,11 +191,11 @@ public class WebRTCHelper {
             peerConnection.addTrack(track);
         }
 
-
-        Log.d(TAG, "✔ PeerConnection created and stream added");
+        Log.d(TAG, "PeerConnection created with TURN support");
     }
 
-    // ✔ Attach remote stream to renderer
+
+
     public void attachRemoteStream(MediaStream remoteStream) {
 
         if (!isVideoCall || remoteStream.videoTracks.isEmpty()) {
@@ -197,7 +215,7 @@ public class WebRTCHelper {
         }
     }
 
-    // ✔ Toggle mute
+
     public void setMute(boolean mute) {
 
         if (localAudioTrack != null) {
@@ -205,13 +223,13 @@ public class WebRTCHelper {
         }
     }
 
-    // ✔ Return local audio track reference
+
     public AudioTrack getAudioTrack() {
 
         return localAudioTrack;
     }
 
-    // ✔ Stop camera, dispose tracks and EGL safely
+
     private boolean stopped = false;
 
     public synchronized void stop() {
@@ -224,7 +242,7 @@ public class WebRTCHelper {
         Log.d(TAG, "🧹 Stopping WebRTC safely...");
 
         try {
-            // Stop camera safely
+
             if (videoCapturer != null) {
                 try {
                     videoCapturer.stopCapture();
@@ -234,8 +252,6 @@ public class WebRTCHelper {
                 } catch (Exception ignored) {}
                 videoCapturer = null;
             }
-
-            // Remove sinks before releasing views
             if (localVideoTrack != null && localView != null) {
                 localVideoTrack.removeSink(localView);
             }
@@ -254,7 +270,6 @@ public class WebRTCHelper {
                 localView = null;
             }
 
-            // Close peer connection safely
             if (peerConnection != null) {
                 try {
                     peerConnection.close();
@@ -263,7 +278,7 @@ public class WebRTCHelper {
                 peerConnection = null;
             }
 
-            // Audio track cleanup
+
             if (localAudioTrack != null) {
                 try {
                     localAudioTrack.dispose();
@@ -271,7 +286,7 @@ public class WebRTCHelper {
                 localAudioTrack = null;
             }
 
-            // Video track cleanup
+
             if (localVideoTrack != null) {
                 try {
                     localVideoTrack.dispose();
@@ -279,7 +294,7 @@ public class WebRTCHelper {
                 localVideoTrack = null;
             }
 
-            // Release EGL last
+
             if (eglBase != null) {
                 try {
                     eglBase.release();
@@ -287,8 +302,8 @@ public class WebRTCHelper {
                 eglBase = null;
             }
 
-            //  Do NOT dispose factory here — reuse is safer
-            // if (factory != null) factory.dispose();
+
+
 
             Log.d(TAG, "WebRTC cleaned safely");
 
@@ -302,7 +317,7 @@ public class WebRTCHelper {
         return peerConnection;
     }
 
-    // ✔ Allow switching front/back camera
+
     public void switchCamera() {
 
         if (videoCapturer instanceof org.webrtc.CameraVideoCapturer) {
@@ -314,7 +329,7 @@ public class WebRTCHelper {
         }
     }
 
-    // ⭐ Needed for Call_layout remote video init
+
     public EglBase.Context getEglContext() {
         return eglBase.getEglBaseContext();
     }

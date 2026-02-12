@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_background_gradient">
 
-    <!-- 🔹 Caller Card -->
     <LinearLayout
         android:id="@+id/caller_info_container"
         android:layout_width="wrap_content"
@@ -49,7 +48,7 @@
             android:textSize="16sp"/>
     </LinearLayout>
 
-    <!-- 🔹 Call Action Buttons -->
+
     <LinearLayout
         android:id="@+id/call_controls"
         android:layout_width="match_parent"

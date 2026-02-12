@@ -4,8 +4,8 @@ package com.example.chat_application;
 public class ContactModel {
     private String name;
     private String phoneNumber;
-    private String localPhotoPath;  // Path to cached image
-    private String profilePicBase64; // Optional: from DB
+    private String localPhotoPath;
+    private String profilePicBase64;
     private String userId;
 
 

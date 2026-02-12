@@ -4,18 +4,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class CallItem implements Parcelable {
-    private String callId;        // unique id for call document in Firestore
+    private String callId;
     private String callName;
     private String callStatus;
-    private String callerId;      // uid of caller (optional)
-    private String otherUserId;   // uid of the other participant (for loading profile)
-    private String profilePicBase64; // optional cached profile pic
-    private boolean isVideo;      // video or audio call
-    private long timestamp;       // milliseconds
-    private int callIcon;         // Resource ID for ImageView
+    private String callerId;
+    private String otherUserId;
+    private String profilePicBase64;
+    private boolean isVideo;
+    private long timestamp;
+    private int callIcon;
     private String direction;
 
-    // Full constructor
     public CallItem(String callId, String callName, String callStatus,
                     String callerId, boolean isVideo, long timestamp, int callIcon, String direction) {
         this.callId = callId;
@@ -28,7 +27,6 @@ public class CallItem implements Parcelable {
         this.direction = direction;
     }
 
-    // Extended constructor with otherUserId and optional profile
     public CallItem(String callId, String callName, String callStatus,
                     String callerId, String otherUserId, String profilePicBase64,
                     boolean isVideo, long timestamp, int callIcon, String direction) {
@@ -37,7 +35,7 @@ public class CallItem implements Parcelable {
         this.profilePicBase64 = profilePicBase64;
     }
 
-    // Backwards-compatible constructor
+
     public CallItem(String callName, String callStatus, int callIcon) {
         this.callId = null;
         this.callName = callName;
@@ -49,7 +47,7 @@ public class CallItem implements Parcelable {
         this.direction = "";
     }
 
-    // Parcelable implementation
+
     protected CallItem(Parcel in) {
         callId = in.readString();
         callName = in.readString();
@@ -92,7 +90,7 @@ public class CallItem implements Parcelable {
         dest.writeString(direction);
     }
 
-    // Getters
+
     public String getCallId() { return callId; }
     public String getCallName() { return callName; }
     public String getCallStatus() { return callStatus; }
@@ -104,7 +102,6 @@ public class CallItem implements Parcelable {
     public int getCallIcon() { return callIcon; }
     public String getDirection() { return direction; }
 
-    // Setters
     public void setCallId(String callId) { this.callId = callId; }
     public void setCallName(String callName) { this.callName = callName; }
     public void setCallStatus(String callStatus) { this.callStatus = callStatus; }
