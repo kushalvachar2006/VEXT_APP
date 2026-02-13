@@ -213,18 +213,11 @@ VEXT_APP/
 ├── app/                          # Main Android application module
 │   ├── src/
 │   │   ├── main/
-│   │   │   ├── java/            # Application source code (Java)
-│   │   │   │   ├── activities/  # Android Activity classes
-│   │   │   │   ├── fragments/   # Fragment components
-│   │   │   │   ├── adapters/    # RecyclerView adapters
-│   │   │   │   ├── models/      # Data models
-│   │   │   │   ├── services/    # Firebase & API services
-│   │   │   │   └── utils/       # Utility classes
+│   │   │   ├── java/            # Application source code (Java)   
 │   │   │   ├── res/             # Resources (layouts, drawables, strings)
 │   │   │   │   ├── layout/      # XML layout files
 │   │   │   │   ├── drawable/    # Image assets
 │   │   │   │   ├── values/      # String, color, dimension resources
-│   │   │   │   └── menu/        # Menu resources
 │   │   │   └── AndroidManifest.xml
 │   │   ├── test/                # Unit tests
 │   │   └── androidTest/         # Instrumented tests
