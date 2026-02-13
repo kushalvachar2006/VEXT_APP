@@ -12,7 +12,8 @@
 [Project Structure](#project-structure) •
 [Installation](#installation--setup) •
 [Architecture Details](#architecture-details) •
-[Contributing](#-contributing)
+[Contributing](#-contributing) •
+[MIT License](#-license)
 </div>
 A feature-rich Android chat application with real-time messaging, video/audio calling, and media sharing capabilities. Built with modern Android architecture and powered by Firebase backend services.
 
@@ -387,7 +388,13 @@ We welcome contributions from the community! Whether it's bug fixes, feature enh
 - Ensure minimum SDK compatibility (API 24+)
 - Test on multiple Android versions
 - Don't introduce breaking changes without discussion
+---
 
+## <a id="-license"></a> License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
 ### Reporting Issues
 
 Found a bug? Have a feature request?
