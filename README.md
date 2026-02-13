@@ -94,13 +94,13 @@ VEXT_APP is a comprehensive communication platform designed to connect users sea
             │               │      │      │               │
             ▼               ▼      ▼      ▼               ▼
         ┌─────────┐    ┌──────┐  ┌──────────┐    ┌────────────┐
-        │  Auth   │    │FCM   │  │Express   │    │ Peer-to-   │
-        │Service  │    │Push  │  │.js       │    │ Peer Audio │
-        └─────────┘    │Notif │  │Multer    │    │ Video Data │
-                       └──────┘  │CORS      │    │ Channels   │
-        ┌───────���─┐              └──────────┘    └────────────┘
+        │  Auth   │    │FCM   │  │Express.js│    │ Peer-to-   │
+        │ Service │    │Push  │  │Multer    │    │ Peer Audio │
+        └─────────┘    │Notif │  │CORS      │    │ Video Data │
+                       └──────┘  └──────────┘    │ Channels   │
+        ┌─────────┐                              └────────────┘
         │Firestore│              │
-        │Real-time│         ┌────┴────┐
+        │Real-time│         ┌────┴─────┐
         │Database │         │Uploads   │
         └─────────┘         │Directory │
                             │(Temp)    │
@@ -111,26 +111,26 @@ VEXT_APP is a comprehensive communication platform designed to connect users sea
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  1. USER AUTHENTICATION                                                 │
-│     Client ──(Google OAuth)──> Firebase Auth ──> Client Session       │
+│     Client ──(Google OAuth)──> Firebase Auth ──> Client Session         │
 │                                                                         │
-│  2. REAL-TIME MESSAGING                                                │
-│     Client A ──(Text Message)──> Firebase Firestore <── Client B      │
-│     Sender ──(FCM Notification)──> Firebase Cloud Messaging           │
-│     Firebase ──(Push Notification)──> Receiver                        │
+│  2. REAL-TIME MESSAGING                                                 │
+│     Client A ──(Text Message)──> Firebase Firestore <── Client B        │
+│     Sender ──(FCM Notification)──> Firebase Cloud Messaging             │
+│     Firebase ──(Push Notification)──> Receiver                          │
 │                                                                         │
 │  3. MEDIA SHARING                                                       │
-│     Client ──(Upload File)──> Storage Server ──> Temporary Upload Dir │
-│     Storage Server ──(Download URL)──> Client                         │
-│     Receiver ──(Download)──> Storage Server ──(Auto-Delete)──> Privacy│
+│     Client ──(Upload File)──> Storage Server ──> Temporary Upload Dir   |
+│     Storage Server ──(Download URL)──> Client                           │
+│     Receiver ──(Download)──> Storage Server ──(Auto-Delete)──> Privacy  │
 │                                                                         │
-│  4. VOICE/VIDEO CALLING                                                │
-│     Client A ──(Signaling)──> Firebase Firestore (Call Signal)       │
-│     Firebase ──(FCM Notification)──> Client B (Incoming Call)        │
-│     Client B ──(Accept/Reject)──> Firebase Firestore                │
-│     Client A ⟷ (WebRTC P2P Connection) ⟷ Client B                   │
-│     ├─ Audio/Video Streams (Direct Peer Connection)                   │
-│     ├─ NAT Traversal (STUN/TURN Servers)                             │
-│     └─ Real-time Data Channels (Low Latency)                         │
+│  4. VOICE/VIDEO CALLING                                                 │
+│     Client A ──(Signaling)──> Firebase Firestore (Call Signal)          │
+│     Firebase ──(FCM Notification)──> Client B (Incoming Call)           │
+│     Client B ──(Accept/Reject)──> Firebase Firestore                    │
+│     Client A ⟷ (WebRTC P2P Connection) ⟷ Client B                     |
+│     ├─ Audio/Video Streams (Direct Peer Connection)                     │
+│     ├─ NAT Traversal (STUN/TURN Servers)                                │
+│     └─ Real-time Data Channels (Low Latency)                            │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
